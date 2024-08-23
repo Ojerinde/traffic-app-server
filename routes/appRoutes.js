@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const appController = require("../controllers/appController");
-const archiveController = require("../controllers/archiveController");
+
 
 router.post("/lecturers", appController.createLecturer);
 
@@ -26,13 +26,6 @@ router.delete(
 );
 router.delete("/courses/:courseCode/reset", appController.deleteCourseData);
 
-/////////////////////////
-// Archive routes
-router.get("/archived_lecturers", archiveController.getArchivedLecturers);
-router.get("/archived_students/:courseId", archiveController.getCourseStudents);
-router.get(
-  "/archived_attendance/:courseId",
-  archiveController.getCourseAttendance
-);
+
 
 module.exports = router;

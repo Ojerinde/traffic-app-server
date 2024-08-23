@@ -1,5 +1,3 @@
-const { string } = require("joi");
-const { Lecturer, Course, Student } = require("../models/appModel");
 const catchAsync = require("../utils/catchAsync");
 const Email = require("../utils/email");
 
