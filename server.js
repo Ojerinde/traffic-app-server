@@ -5,6 +5,8 @@ require("dotenv").config();
 const app = require("./app");
 const connectToMongoDB = require("./db");
 
+const PORT = process.env.PORT || 5000
+
 const httpServer = createServer(app);
 
 let wss;

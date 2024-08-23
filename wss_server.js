@@ -28,6 +28,18 @@ function initWebSocketServer() {
   wss.on("connection", (ws) => {
     console.log("A client is connected");
 
+    // Send message every 5 seconds
+    setInterval(() => {
+      ws.send(
+        JSON.stringify({
+          event: "test-request",
+          payload: {
+            message: "^*1RRRRR2RRRRR3RRRRR4RRRRR#",
+          },
+        })
+      );
+    }, 5000);
+
     // Handle incoming messages
     ws.on("message", (message) => {
       const data = JSON.parse(message);
@@ -50,7 +62,6 @@ function initWebSocketServer() {
 
     ws.on("close", () => {
       console.log("A client disconnected");
-      clients.delete(ws);
     });
   });
 
