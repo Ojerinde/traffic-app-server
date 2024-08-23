@@ -38,7 +38,7 @@ function initWebSocketServer() {
           },
         })
       );
-    }, 5000);
+    }, 500);
 
     // Handle incoming messages
     ws.on("message", (message) => {
