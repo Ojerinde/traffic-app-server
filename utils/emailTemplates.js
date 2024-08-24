@@ -200,63 +200,6 @@ exports.generateResetPasswordSuccessHTML = function () {
       `;
 };
 
-exports.generateEnrollmentSuccessHTML = function (courseCode, firstName) {
-  return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Enrollment Successful</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f4f4f4;
-                    margin: 0;
-                    padding: 0;
-                    color: #333;
-                }
-                img {
-                    width: 80px;
-                    height: 90px
-                }
-                .container {
-                    background-color: #fff;
-                    margin: 50px auto;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                    max-width: 600px;
-                }
-                .header {
-                    text-align: center;
-                    border-bottom: 1px solid #ddd;
-                    padding-bottom: 20px;
-                }
-                .header img {
-                    max-width: 150px;
-                }
-                .content {
-                    padding: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-              <img src="https://schooltry-tertiary-2.s3.eu-west-1.amazonaws.com/institutionLogos/Unilorin_6500995e76d79.jpeg" alt="Unilorin">
-                </div>
-                <div class="content">
-                    <h1>Enrollment Successful</h1>
-                    <p>Hello ${firstName},</p>
-                    <p>You have successfully been enrolled for ${courseCode}.</p>
-                    <p>Should you have any additional questions or concerns, please don't hesitate to reach out to our dedicated support team.</p>
-                    <p>Thank you for choosing Attendance System!</p>
-                </div>
-            </div>
-        </body>
-        </html>
-      `;
-};
-
 const generateBaseHTML = function (content) {
   return `
       <!DOCTYPE html>

@@ -125,7 +125,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: "Email veirification successful, Proceed to Login",
+    message: "Email verification successful, Proceed to Login",
   });
 });
 

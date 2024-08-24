@@ -45,15 +45,15 @@ const attendanceSchema = new Schema({
   course: { type: Schema.Types.ObjectId, ref: "Course" },
 });
 
-// Create models
-const Lecturer = mongoose.model("Lecturer", lecturerSchema);
-const Course = mongoose.model("Course", courseSchema);
-const Student = mongoose.model("Student", studentSchema);
-const Attendance = mongoose.model("Attendance", attendanceSchema);
+// // Create models
+// const Lecturer = mongoose.model("Lecturer", lecturerSchema);
+// const Course = mongoose.model("Course", courseSchema);
+// const Student = mongoose.model("Student", studentSchema);
+// const Attendance = mongoose.model("Attendance", attendanceSchema);
 
-module.exports = {
-  Lecturer,
-  Course,
-  Student,
-  Attendance,
-};
+// module.exports = {
+//   Lecturer,
+//   Course,
+//   Student,
+//   Attendance,
+// };

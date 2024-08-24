@@ -1,5 +1,10 @@
 /* eslint-disable node/no-extraneous-require */
 const nodemailer = require("nodemailer");
+const {
+  generateEmailVerificationHTML,
+  generateResetPasswordHTML,
+  generateResetPasswordSuccessHTML,
+} = require("./emailTemplates");
 
 class Email {
   constructor(user, url) {
@@ -48,6 +53,25 @@ class Email {
 
   async sendWelcome() {
     await this.send("Welcome to the Attendance System Website");
+  }
+
+  async sendEmailVerification() {
+    await this.send(
+      generateEmailVerificationHTML(this.firstName, this.url),
+      "Email Verification Link"
+    );
+  }
+  async sendPasswordReset() {
+    await this.send(
+      generateResetPasswordHTML(this.firstName, this.url),
+      "Password Reset Link (valid for only 1 hour)"
+    );
+  }
+  async sendPasswordResetSuccess() {
+    await this.send(
+      generateResetPasswordSuccessHTML(),
+      "Account Password Reset Successful"
+    );
   }
 }
 

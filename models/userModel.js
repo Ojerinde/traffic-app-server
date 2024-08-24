@@ -5,10 +5,6 @@ const validator = require("validator");
 const { isPasswordValid } = require("../utils/validators");
 
 const userSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, "Title is required"],
-  },
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -103,7 +99,7 @@ userSchema.methods.genPasswordResetToken = function () {
     .update(resetToken)
     .digest("hex");
   // console.log({ resetToken }, this.passwordResetToken);
-  this.passwordResetTokenExpiresIn = Date.now() + 60 * 60 * 1000; // 30 minutes
+  this.passwordResetTokenExpiresIn = Date.now() + 60 * 60 * 1000; // 1hr
   return resetToken;
 };
 
