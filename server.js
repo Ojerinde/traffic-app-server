@@ -18,10 +18,20 @@ function initWebSocketServer() {
   wss.on("connection", (ws) => {
     console.log("A client is connected");
 
+    const interval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ event: "ping" }));
+      }
+    }, 10000);
+
     // Handle incoming messages
     ws.on("message", (message) => {
       const data = JSON.parse(message);
       console.log(`${data?.event} event received from client`);
+
+      if (data?.event === "pong") {
+        console.log("Pong received from client");
+      }
 
       switch (data?.event) {
         case "test":
@@ -48,6 +58,7 @@ function initWebSocketServer() {
   httpServer.on("close", () => {
     wss.close(() => {
       console.log("WebSocket server closed");
+      clearInterval(interval);
     });
   });
 }

@@ -2,16 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Define schema for Lecturer
-const lecturerSchema = new Schema({
-  name: String,
-  email: String,
+const deviceSchema = new Schema({
+  type: { a, b, c, d },
+  Id: String,
   title: String,
-  selectedCourses: [
-    {
-      courseCode: String,
-      courseName: String,
-    },
-  ],
 });
 
 // Define schema for Course

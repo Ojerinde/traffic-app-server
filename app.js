@@ -8,6 +8,7 @@ const path = require("path");
 
 // RouteHandler
 const authRouter = require("./routes/authRoutes");
+const adminAuthRouter = require("./routes/adminAuthRoutes");
 const appRouter = require("./routes/appRoutes");
 
 // Utils
@@ -45,6 +46,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/auth/admin", adminAuthRouter);
 app.use("/api/v1", appRouter);
 
 // Any request that makes it to this part has lost it's way

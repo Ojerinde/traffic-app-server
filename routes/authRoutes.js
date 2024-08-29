@@ -7,6 +7,7 @@ const {
 
 const router = express.Router();
 
+// Normal Users Auth Routes
 router.post("/signup", authController.signup);
 router.post("/signin", authController.login);
 router.patch(
