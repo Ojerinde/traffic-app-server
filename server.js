@@ -18,29 +18,17 @@ function initWebSocketServer() {
   wss.on("connection", (ws) => {
     console.log("A client is connected");
 
-    const interval = setInterval(() => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ event: "ping" }));
-      }
-    }, 10000);
+    // Temporary property to store client type
+    ws.clientType = null;
 
-    // Handle incoming messages
     ws.on("message", (message) => {
       const data = JSON.parse(message);
       console.log(`${data?.event} event received from client`);
 
-      if (data?.event === "pong") {
-        console.log("Pong received from client");
-      }
-
       switch (data?.event) {
-        case "test":
-          console.log("Test request received from web app");
-          break;
-
-        // Feedback from ESP32 device
-        case "test_response":
-          console.log("Test response received from device");
+        case "identify":
+          console.log(`Client identified as: ${ws.clientType}`);
+          if (data.clientType) ws.clientType = data.clientType;
           break;
 
         default:
@@ -48,9 +36,28 @@ function initWebSocketServer() {
       }
     });
 
+    ws.on("ping", (event) => {
+      console.log("Received ping from hardware", event);
+
+      const message = JSON.stringify({
+        event: "ping_received",
+        source: "hardware",
+        timestamp: new Date(),
+      });
+
+      wss.clients.forEach((client) => {
+        console.log("client", client.clientType);
+        if (
+          client.readyState === WebSocket.OPEN &&
+          client.clientType === "web_app"
+        ) {
+          client.send(message);
+        }
+      });
+    });
+
     ws.on("close", () => {
       console.log("A client disconnected");
-      clients.delete(ws);
     });
   });
 
@@ -58,11 +65,9 @@ function initWebSocketServer() {
   httpServer.on("close", () => {
     wss.close(() => {
       console.log("WebSocket server closed");
-      clearInterval(interval);
     });
   });
 }
-
 connectToMongoDB()
   .then(() => {
     console.log("Connection to MongoDB is successful.");
