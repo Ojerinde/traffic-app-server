@@ -28,19 +28,17 @@ function initWebSocketServer() {
   wss.on("connection", (ws) => {
     console.log("A client is connected");
 
-    // Handle incoming messages
+    // Temporary property to store client type
+    ws.clientType = null;
+
     ws.on("message", (message) => {
       const data = JSON.parse(message);
       console.log(`${data?.event} event received from client`);
 
       switch (data?.event) {
-        case "test":
-          console.log("Test request received from web app");
-          break;
-
-        // Feedback from ESP32 device
-        case "test_response":
-          console.log("Test response received from device");
+        case "identify":
+          if (data.clientType) ws.clientType = data.clientType;
+          console.log(`Client identified as: ${ws.clientType}`);
           break;
 
         default:
@@ -58,7 +56,10 @@ function initWebSocketServer() {
       });
 
       wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
+        if (
+          client.readyState === WebSocket.OPEN &&
+          client.clientType === "web_app"
+        ) {
           client.send(message);
         }
       });
