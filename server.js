@@ -27,8 +27,8 @@ function initWebSocketServer() {
 
       switch (data?.event) {
         case "identify":
-          console.log(`Client identified as: ${ws.clientType}`);
           if (data.clientType) ws.clientType = data.clientType;
+          console.log(`Client identified as: ${ws.clientType}`);
           break;
 
         default:
@@ -49,7 +49,7 @@ function initWebSocketServer() {
         console.log("client", client.clientType);
         if (
           client.readyState === WebSocket.OPEN &&
-          client.clientType === "web_app"
+          client.clientType !== null
         ) {
           client.send(message);
         }
