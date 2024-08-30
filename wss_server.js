@@ -46,8 +46,8 @@ function initWebSocketServer() {
       }
     });
 
-    ws.on("ping", () => {
-      console.log("Received ping from hardware");
+    ws.on("ping", (event) => {
+      console.log("Received ping from hardware", event);
 
       const message = JSON.stringify({
         event: "ping_received",
@@ -59,7 +59,7 @@ function initWebSocketServer() {
         console.log("client", client.clientType);
         if (
           client.readyState === WebSocket.OPEN &&
-          client.clientType === "web_app"
+          client.clientType !== null
         ) {
           client.send(message);
         }
