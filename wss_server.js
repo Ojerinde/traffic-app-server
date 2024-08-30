@@ -56,6 +56,7 @@ function initWebSocketServer() {
       });
 
       wss.clients.forEach((client) => {
+        console.log("client", client.clientType);
         if (
           client.readyState === WebSocket.OPEN &&
           client.clientType === "web_app"
