@@ -48,6 +48,22 @@ function initWebSocketServer() {
       }
     });
 
+    ws.on("ping", () => {
+      console.log("Received ping from hardware");
+
+      const message = JSON.stringify({
+        event: "ping_received",
+        source: "hardware",
+        timestamp: new Date(),
+      });
+
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(message);
+        }
+      });
+    });
+
     ws.on("close", () => {
       console.log("A client disconnected");
     });

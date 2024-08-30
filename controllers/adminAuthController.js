@@ -46,7 +46,7 @@ const sendVerificationEmail = async (user, req, res, next) => {
   const emailVerificationToken = user.genEmailVerificationToken();
   await user.save({ validateBeforeSave: false }); // To save the emailVerification token and expires from the genEmailVerification method.
 
-  const emailVerificationUrl = `${process.env.CLIENT_URL}/verify_email/${emailVerificationToken}`;
+  const emailVerificationUrl = `${process.env.CLIENT_URL}/admin/verify_email/${emailVerificationToken}`;
 
   try {
     await new Email(user, emailVerificationUrl).sendEmailVerification();
@@ -93,6 +93,8 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { emailVerificationToken } = req.params;
+  console.log("emailVerificationtoken", emailVerificationToken);
+
   const hashedToken = crypto
     .createHash("sha256")
     .update(emailVerificationToken)
@@ -102,6 +104,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
     emailVerificationToken: hashedToken,
     emailVerificationTokenExpiresIn: { $gt: Date.now() },
   });
+  console.log("unverifiedUser", unverifiedUser, emailVerificationToken);
 
   const userToDelete = await AdminUser.findOne({
     emailVerificationToken: hashedToken,
@@ -109,7 +112,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
   if (!unverifiedUser) {
     // Delete user if the user could not be verified
-    await AdminUser.findByIdAndDelete(userToDelete._id);
+    if (userToDelete) await AdminUser.findByIdAndDelete(userToDelete._id);
 
     return next(
       new AppError(

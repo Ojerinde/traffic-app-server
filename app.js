@@ -10,6 +10,7 @@ const path = require("path");
 const authRouter = require("./routes/authRoutes");
 const adminAuthRouter = require("./routes/adminAuthRoutes");
 const appRouter = require("./routes/appRoutes");
+const adminAppRouter = require("./routes/adminAppRoutes");
 
 // Utils
 const GlobalErrorHandler = require("./controllers/errorController");
@@ -48,6 +49,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/auth/admin", adminAuthRouter);
 app.use("/api/v1", appRouter);
+app.use("/api/v1/admin", adminAppRouter);
 
 // Any request that makes it to this part has lost it's way
 app.all("*", (req, res, next) => {
