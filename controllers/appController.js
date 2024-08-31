@@ -65,6 +65,7 @@ exports.getAllDeviceByUserHandler = catchAsync(async (req, res, next) => {
   console.log("Getting all devices by user");
   const { email } = req.params;
   const devices = await UserDevice.find({ email });
+  console.log("User devices", devices);
   return res.status(200).json({
     devices,
   });

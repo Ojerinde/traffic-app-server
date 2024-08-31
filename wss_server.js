@@ -37,8 +37,8 @@ function initWebSocketServer() {
 
       switch (data?.event) {
         case "identify":
-          console.log(`Client identified as: ${ws.clientType}`);
           if (data.clientType) ws.clientType = data.clientType;
+          console.log(`Client identified as: ${ws.clientType}`);
           break;
 
         default:
