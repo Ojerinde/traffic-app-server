@@ -49,14 +49,11 @@ function initWebSocketServer() {
     ws.on("ping", (buffer) => {
       console.log("Received ping from hardware", buffer);
 
-      const idHex = buffer.toString("hex");
-      console.log("ID (Hex):", idHex);
       const idUtf8 = buffer.toString("utf8");
-      console.log("ID (UTF-8):", idUtf8);
 
       const message = JSON.stringify({
         event: "ping_received",
-        source: "hardware",
+        source: { type: "hardware", id: idUtf8 },
         timestamp: new Date(),
       });
 
