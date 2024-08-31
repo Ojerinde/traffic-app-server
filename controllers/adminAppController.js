@@ -35,7 +35,6 @@ exports.getAllDeviceByAdminHandler = catchAsync(async (req, res, next) => {
   console.log("Getting all devices");
   const { deviceDeparment } = req.params;
   const devices = await AdminDevice.find({ deviceDeparment });
-
   return res.status(200).json({
     devices,
   });
