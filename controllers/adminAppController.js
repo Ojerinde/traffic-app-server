@@ -3,7 +3,14 @@ const catchAsync = require("../utils/catchAsync");
 
 exports.addDeviceByAdminHandler = catchAsync(async (req, res, next) => {
   console.log("Adding device", req.body);
-  const { deviceId, deviceType, adminEmail } = req.body;
+  const {
+    deviceId,
+    deviceType,
+    adminEmail,
+    deviceStatus,
+    ownerEmail,
+    purchasedDate,
+  } = req.body;
 
   if (!deviceId || !deviceType || !adminEmail) {
     return res.status(400).json({ message: "All fields are required." });
@@ -23,6 +30,11 @@ exports.addDeviceByAdminHandler = catchAsync(async (req, res, next) => {
     deviceType,
     adminEmail,
     deviceDepartment: department,
+    deviceStatus: {
+      status: deviceStatus.value,
+      ownerEmail: deviceStatus.value === "purchased" ? ownerEmail : "",
+      purchaseDate: deviceStatus.value === "purchased" ? purchasedDate : null,
+    },
   });
 
   res.status(201).json({

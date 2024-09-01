@@ -5,14 +5,26 @@ const { generateSecretKey } = require("../utils/misc");
 
 exports.getDeviceDetailById = catchAsync(async (req, res, next) => {
   console.log("Getting device detail by user", req.params);
-  const { deviceId } = req.params;
+  const { deviceId, userEmail } = req.params;
 
   const existingDevice = await AdminDevice.findOne({ deviceId: deviceId });
 
   if (!existingDevice) {
     return res.status(400).json({ message: "Invalid Device ID" });
   }
+  if (existingDevice.deviceStatus.status !== "purchased") {
+    return res.status(400).json({ message: "Device has not been purchased." });
+  }
 
+  if (
+    existingDevice.deviceStatus.ownerEmail &&
+    existingDevice.deviceStatus.ownerEmail.toLowerCase() !==
+      userEmail.toLowerCase()
+  ) {
+    return res
+      .status(403)
+      .json({ message: "You are not authorized to add this device." });
+  }
   const device = {
     type: existingDevice.deviceType,
     id: existingDevice.deviceId,

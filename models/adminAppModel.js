@@ -20,6 +20,47 @@ const adminDeviceSchema = new Schema({
     type: String,
     required: [true, "Email of admin is required "],
   },
+
+  deviceStatus: {
+    status: {
+      type: String,
+      enum: {
+        values: ["available", "purchased"],
+        message:
+          '{VALUE} is not a valid status. Status must be either "available" or "purchased".',
+      },
+      required: [true, "Device status is required"],
+    },
+    ownerEmail: {
+      type: String,
+      required: function () {
+        return this.deviceStatus.status === "purchased";
+      },
+      validate: {
+        validator: function (v) {
+          return (
+            this.deviceStatus.status !== "purchased" || /^\S+@\S+\.\S+$/.test(v)
+          );
+        },
+        message: (props) => `${props.value} is not a valid email address`,
+      },
+    },
+    purchaseDate: {
+      type: Date,
+      required: function () {
+        return this.deviceStatus.status === "purchased";
+      },
+      validate: {
+        validator: function (v) {
+          return (
+            this.deviceStatus.status !== "purchased" ||
+            (v instanceof Date && !isNaN(v))
+          );
+        },
+        message: (props) => `${props.value} is not a valid date`,
+      },
+    },
+  },
   createdAt: {
     type: Date,
     default: Date.now,
