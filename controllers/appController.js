@@ -1,5 +1,5 @@
 const { AdminDevice } = require("../models/adminAppModel");
-const { UserDevice } = require("../models/appModel");
+const { UserDevice, UserPhase, UserPattern } = require("../models/appModel");
 const catchAsync = require("../utils/catchAsync");
 const { generateSecretKey } = require("../utils/misc");
 
@@ -77,8 +77,83 @@ exports.getAllDeviceByUserHandler = catchAsync(async (req, res, next) => {
   console.log("Getting all devices by user");
   const { email } = req.params;
   const devices = await UserDevice.find({ email });
-  console.log("User devices", devices);
+
   return res.status(200).json({
     devices,
+  });
+});
+
+exports.addPhaseByUserHandler = catchAsync(async (req, res, next) => {
+  console.log("Adding Phase by user", req.body);
+
+  const { email, phaseName, phaseData } = req.body;
+
+  // Check if phases already exists for the user
+  const userPhase = await UserPhase.findOne({ email });
+
+  // Check for the existing phase name
+  if (userPhase) {
+    const existingPhase = userPhase.phases.find(
+      (phase) => phase.name === phaseName
+    );
+
+    if (existingPhase) {
+      return res.status(400).json({
+        message: `Phase with name "${phaseName}" already exists!`,
+      });
+    }
+  }
+
+  const phase = {
+    name: phaseName,
+    data: phaseData,
+  };
+
+  await UserPhase.findOneAndUpdate(
+    { email },
+    { $push: { phases: phase } },
+    { upsert: true }
+  );
+
+  res.status(201).json({
+    message: `Phase ${phaseName} added successfully!`,
+  });
+});
+
+exports.getAllPhaseByUserHandler = catchAsync(async (req, res, next) => {
+  console.log("Getting Phase by user");
+
+  const { email } = req.params;
+  const phases = await UserPhase.findOne({ email });
+  res.status(200).json({
+    data: phases,
+  });
+});
+
+exports.addPatternByUserHandler = catchAsync(async (req, res, next) => {
+  const { email, patternName, selectedPhases } = req.body;
+
+  const pattern = {
+    name: patternName,
+    phases: selectedPhases,
+  };
+
+  await UserPattern.findOneAndUpdate(
+    { email },
+    { $push: { patterns: pattern } },
+    { upsert: true }
+  );
+
+  res.status(201).json({
+    message: `Pattern ${patternName} added successfully!`,
+  });
+});
+
+exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
+  const { email } = req.params;
+  const userPatterns = await UserPattern.findOne({ email });
+
+  res.status(200).json({
+    patterns: userPatterns ? userPatterns.patterns : [],
   });
 });

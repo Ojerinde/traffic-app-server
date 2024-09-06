@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// Define schema for Lecturer
+// Define schema for USer
 const userDeviceSchema = new Schema({
   deviceId: {
     type: String,
@@ -27,9 +27,32 @@ const userDeviceSchema = new Schema({
   },
 });
 
-// // Create models
+const userPhaseSchema = new Schema({
+  email: { type: String, required: true },
+  phases: [
+    {
+      name: { type: String, required: true },
+      data: { type: String, required: true },
+    },
+  ],
+});
+const patternSchema = new Schema({
+  email: { type: String, required: true },
+  patterns: [
+    {
+      name: { type: String, required: true },
+      phases: { type: [String], required: true },
+    },
+  ],
+});
+
+// Create models
 const UserDevice = mongoose.model("UserDevice", userDeviceSchema);
+const UserPhase = mongoose.model("UserPhase", userPhaseSchema);
+const UserPattern = mongoose.model("UserPattern", patternSchema);
 
 module.exports = {
   UserDevice,
+  UserPhase,
+  UserPattern,
 };
