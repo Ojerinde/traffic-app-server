@@ -36,12 +36,19 @@ const userPhaseSchema = new Schema({
     },
   ],
 });
-const patternSchema = new Schema({
+
+const userPatternSchema = new Schema({
   email: { type: String, required: true },
   patterns: [
     {
       name: { type: String, required: true },
-      phases: { type: [String], required: true },
+      phases: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "UserPhase.phases",
+          required: true,
+        },
+      ],
     },
   ],
 });
@@ -49,7 +56,7 @@ const patternSchema = new Schema({
 // Create models
 const UserDevice = mongoose.model("UserDevice", userDeviceSchema);
 const UserPhase = mongoose.model("UserPhase", userPhaseSchema);
-const UserPattern = mongoose.model("UserPattern", patternSchema);
+const UserPattern = mongoose.model("UserPattern", userPatternSchema);
 
 module.exports = {
   UserDevice,

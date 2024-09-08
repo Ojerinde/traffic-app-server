@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const adminAppController = require("../controllers/adminAppController");
 
-router.post("/device", adminAppController.addDeviceByAdminHandler);
+router.post("/devices", adminAppController.addDeviceByAdminHandler);
 router.get(
-  "/device/:deviceDepartment",
+  "/devices/:deviceDepartment",
   adminAppController.getAllDeviceByAdminHandler
 );
 

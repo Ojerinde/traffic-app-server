@@ -82,16 +82,15 @@ exports.getAllDeviceByUserHandler = catchAsync(async (req, res, next) => {
     devices,
   });
 });
-
 exports.addPhaseByUserHandler = catchAsync(async (req, res, next) => {
   console.log("Adding Phase by user", req.body);
 
   const { email, phaseName, phaseData } = req.body;
 
-  // Check if phases already exists for the user
+  // Check if phases already exist for the user
   const userPhase = await UserPhase.findOne({ email });
 
-  // Check for the existing phase name
+  // Check for existing phase name
   if (userPhase) {
     const existingPhase = userPhase.phases.find(
       (phase) => phase.name === phaseName
@@ -109,14 +108,15 @@ exports.addPhaseByUserHandler = catchAsync(async (req, res, next) => {
     data: phaseData,
   };
 
-  await UserPhase.findOneAndUpdate(
+  const updatedPhase = await UserPhase.findOneAndUpdate(
     { email },
     { $push: { phases: phase } },
-    { upsert: true }
+    { upsert: true, new: true }
   );
 
   res.status(201).json({
     message: `Phase ${phaseName} added successfully!`,
+    phase: updatedPhase.phases[updatedPhase.phases.length - 1],
   });
 });
 
@@ -131,8 +131,29 @@ exports.getAllPhaseByUserHandler = catchAsync(async (req, res, next) => {
 });
 
 exports.addPatternByUserHandler = catchAsync(async (req, res, next) => {
+  console.log("Adding Pattern by user", req.body);
   const { email, patternName, selectedPhases } = req.body;
 
+  const userPhases = await UserPhase.findOne({ email });
+
+  if (!userPhases) {
+    return res.status(400).json({
+      message: "No phases found for this user!",
+    });
+  }
+
+  const phaseIds = userPhases.phases.map((phase) => String(phase._id));
+
+  // Check if all selected phases are valid
+  const allPhasesValid = selectedPhases.every((phaseId) =>
+    phaseIds.includes(phaseId)
+  );
+
+  if (!allPhasesValid) {
+    return res.status(400).json({
+      message: "One or more phases are invalid!",
+    });
+  }
   const pattern = {
     name: patternName,
     phases: selectedPhases,
@@ -150,8 +171,14 @@ exports.addPatternByUserHandler = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
+  console.log("Getting all patterns by user", req.params);
   const { email } = req.params;
-  const userPatterns = await UserPattern.findOne({ email });
+  const userPatterns = await UserPattern.findOne({ email }).populate({
+    path: "patterns.phases", // Path where phases are stored
+    model: "UserPhase", // Name of the collection/model to reference
+    select: "phases.name", // Fields you want to populate (e.g., phase name)
+  });
+  console.log("User Pattern", userPatterns);
 
   res.status(200).json({
     patterns: userPatterns ? userPatterns.patterns : [],
