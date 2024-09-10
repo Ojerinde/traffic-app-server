@@ -125,28 +125,39 @@ exports.getAllPhaseByUserHandler = catchAsync(async (req, res, next) => {
 
   const { email } = req.params;
   const phases = await UserPhase.findOne({ email });
+  console.log("Phases", phases);
   res.status(200).json({
     data: phases,
   });
 });
 
-exports.addPatternByUserHandler = catchAsync(async (req, res, next) => {
-  console.log("Adding Pattern by user", req.body);
-  const { email, patternName, selectedPhases } = req.body;
+exports.deletePhaseByUserHandler = catchAsync(async (req, res) => {
+  console.log("Deleting phase by user", req.params);
+  const { phaseId, email } = req.params;
 
-  const userPhases = await UserPhase.findOne({ email });
+  const updatedUser = await UserPhase.findOneAndUpdate(
+    { email },
+    { $pull: { phases: { _id: phaseId } } },
+    { new: true }
+  );
 
-  if (!userPhases) {
-    return res.status(400).json({
-      message: "No phases found for this user!",
+  if (!updatedUser) {
+    return res.status(404).json({
+      message: "Phase not found or you don't have permission to delete it.",
     });
   }
 
-  const phaseIds = userPhases.phases.map((phase) => String(phase._id));
+  res.status(200).json({ message: "Phase successfully deleted." });
+});
 
-  // Check if all selected phases are valid
+exports.addPatternByUserHandler = catchAsync(async (req, res) => {
+  const { email, patternName, selectedPhases } = req.body;
+
+  const phaseIds = await UserPhase.find({ email }).select("_id");
+  const validPhaseIds = phaseIds.map((phase) => phase._id.toString());
+
   const allPhasesValid = selectedPhases.every((phaseId) =>
-    phaseIds.includes(phaseId)
+    validPhaseIds.includes(phaseId)
   );
 
   if (!allPhasesValid) {
@@ -154,6 +165,20 @@ exports.addPatternByUserHandler = catchAsync(async (req, res, next) => {
       message: "One or more phases are invalid!",
     });
   }
+
+  // Ensure no duplicate pattern name
+  const existingPattern = await UserPattern.findOne({
+    email,
+    "patterns.name": patternName,
+  });
+
+  if (existingPattern) {
+    return res.status(400).json({
+      message: `Pattern name "${patternName}" already exists!`,
+    });
+  }
+
+  // Create the new pattern
   const pattern = {
     name: patternName,
     phases: selectedPhases,
@@ -166,21 +191,63 @@ exports.addPatternByUserHandler = catchAsync(async (req, res, next) => {
   );
 
   res.status(201).json({
-    message: `Pattern ${patternName} added successfully!`,
+    message: `Pattern "${patternName}" added successfully!`,
   });
 });
 
 exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
   console.log("Getting all patterns by user", req.params);
   const { email } = req.params;
-  const userPatterns = await UserPattern.findOne({ email }).populate({
-    path: "patterns.phases", // Path where phases are stored
-    model: "UserPhase", // Name of the collection/model to reference
-    select: "phases.name", // Fields you want to populate (e.g., phase name)
+
+  const userPhases = await UserPhase.findOne({ email });
+
+  if (!userPhases) {
+    return res.status(404).json({ message: "No phases found for this user" });
+  }
+
+  const userPatterns = await UserPattern.findOne({ email });
+
+  if (!userPatterns) {
+    return res.status(404).json({ message: "No patterns found for this user" });
+  }
+
+  const populatedPatterns = userPatterns.patterns.map((pattern) => {
+    const populatedPhases = pattern.phases
+      .map((phaseId) =>
+        userPhases.phases.find(
+          (phase) => phase._id.toString() === phaseId.toString()
+        )
+      )
+      .filter((phase) => phase);
+
+    return {
+      ...pattern.toObject(),
+      phases: populatedPhases,
+    };
   });
-  console.log("User Pattern", userPatterns);
 
   res.status(200).json({
-    patterns: userPatterns ? userPatterns.patterns : [],
+    data: {
+      patterns: populatedPatterns,
+    },
   });
+});
+
+exports.deletePatternByUserHandler = catchAsync(async (req, res) => {
+  console.log("Deleting pattern by user", req.params);
+  const { patternId, email } = req.params;
+
+  const updatedUser = await UserPattern.findOneAndUpdate(
+    { email },
+    { $pull: { patterns: { _id: patternId } } },
+    { new: true }
+  );
+
+  if (!updatedUser) {
+    return res.status(404).json({
+      message: "Pattern not found or you don't have permission to delete it.",
+    });
+  }
+
+  res.status(200).json({ message: "Pattern successfully deleted." });
 });

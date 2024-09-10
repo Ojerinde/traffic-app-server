@@ -31,6 +31,7 @@ const userPhaseSchema = new Schema({
   email: { type: String, required: true },
   phases: [
     {
+      _id: { type: Schema.Types.ObjectId, auto: true },
       name: { type: String, required: true },
       data: { type: String, required: true },
     },
@@ -45,7 +46,7 @@ const userPatternSchema = new Schema({
       phases: [
         {
           type: Schema.Types.ObjectId,
-          ref: "UserPhase.phases",
+          ref: "UserPhase",
           required: true,
         },
       ],
