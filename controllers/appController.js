@@ -225,6 +225,7 @@ exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
       phases: populatedPhases,
     };
   });
+  console.log("Populated Patterns", populatedPatterns);
 
   res.status(200).json({
     data: {
