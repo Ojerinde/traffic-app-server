@@ -153,11 +153,11 @@ exports.deletePhaseByUserHandler = catchAsync(async (req, res) => {
 exports.addPatternByUserHandler = catchAsync(async (req, res) => {
   const { email, patternName, selectedPhases } = req.body;
 
-  const phaseIds = await UserPhase.find({ email }).select("_id");
-  const validPhaseIds = phaseIds.map((phase) => phase._id.toString());
+  const user = await UserPhase.findOne({ email });
+  const userPhasesID = user.phases.map((phase) => phase._id.toString());
 
   const allPhasesValid = selectedPhases.every((phaseId) =>
-    validPhaseIds.includes(phaseId)
+    userPhasesID.includes(phaseId)
   );
 
   if (!allPhasesValid) {
@@ -225,7 +225,6 @@ exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
       phases: populatedPhases,
     };
   });
-  console.log("Populated Patterns", populatedPatterns);
 
   res.status(200).json({
     data: {
