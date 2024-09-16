@@ -151,6 +151,8 @@ exports.deletePhaseByUserHandler = catchAsync(async (req, res) => {
 });
 
 exports.addPatternByUserHandler = catchAsync(async (req, res) => {
+  console.log("Adding pattern by user", req.body);
+
   const { email, patternName, selectedPhases } = req.body;
 
   const user = await UserPhase.findOne({ email });
