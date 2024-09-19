@@ -1,5 +1,11 @@
 const { AdminDevice } = require("../models/adminAppModel");
-const { UserDevice, UserPhase, UserPattern } = require("../models/appModel");
+const {
+  UserDevice,
+  UserPhase,
+  UserPattern,
+  UserGroup,
+} = require("../models/appModel");
+const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const { generateSecretKey } = require("../utils/misc");
 
@@ -82,6 +88,7 @@ exports.getAllDeviceByUserHandler = catchAsync(async (req, res, next) => {
     devices,
   });
 });
+
 exports.addPhaseByUserHandler = catchAsync(async (req, res, next) => {
   console.log("Adding Phase by user", req.body);
 
@@ -125,7 +132,7 @@ exports.getAllPhaseByUserHandler = catchAsync(async (req, res, next) => {
 
   const { email } = req.params;
   const phases = await UserPhase.findOne({ email });
-  console.log("Phases", phases);
+
   res.status(200).json({
     data: phases,
   });
@@ -147,7 +154,7 @@ exports.deletePhaseByUserHandler = catchAsync(async (req, res) => {
     });
   }
 
-  res.status(200).json({ message: "Phase successfully deleted." });
+  res.status(204).json({ message: "Phase successfully deleted." });
 });
 
 exports.addPatternByUserHandler = catchAsync(async (req, res) => {
@@ -251,5 +258,102 @@ exports.deletePatternByUserHandler = catchAsync(async (req, res) => {
     });
   }
 
-  res.status(200).json({ message: "Pattern successfully deleted." });
+  res.status(204).json({ message: "Pattern successfully deleted." });
+});
+
+exports.addGroupByUserHandler = catchAsync(async (req, res) => {
+  console.log("Adding Group by user", req.body);
+
+  const { name, email, patterns } = req.body;
+
+  patterns.forEach((pattern, index) => {
+    if (!pattern.startTime || !pattern.endTime) {
+      console.error(
+        `Pattern at index ${index} is missing startTime or endTime`
+      );
+    }
+  });
+
+  const newGroup = await UserGroup.create({
+    name,
+    email,
+    patterns: patterns.map((pattern) => ({
+      name: pattern.name,
+      startTime: pattern.startTime,
+      endTime: pattern.endTime,
+      phases: pattern.phases.map((phase) => ({
+        name: phase.name,
+        phaseId: phase.phaseId,
+        phaseData: phase.phaseData,
+        duration: phase.duration,
+      })),
+    })),
+  });
+
+  return res.status(201).json({
+    message: "Group successfully created with multiple patterns",
+    data: newGroup,
+  });
+});
+
+exports.getAllGroupsByUserHandler = catchAsync(async (req, res, next) => {
+  console.log("Getting all groups by user", req.params);
+  const { email } = req.params;
+
+  const groups = await UserGroup.find({ email });
+
+  if (!groups || groups.length === 0) {
+    return res.status(404).json({
+      message: "No groups found for this user",
+    });
+  }
+  console.log("Gropus", groups);
+  res.status(200).json({
+    data: groups,
+  });
+});
+
+exports.deleteGroupByUserHandler = catchAsync(async (req, res) => {
+  console.log("Deleting group by user", req.params);
+  const { groupId, email } = req.params;
+
+  const group = await UserGroup.findOneAndDelete({ _id: groupId, email });
+
+  if (!group) {
+    return res.status(404).json({
+      message: "Group not found or you don't have permission to delete it.",
+    });
+  }
+
+  res.status(204).json({
+    message: "Group successfully deleted.",
+  });
+});
+
+exports.confirmPasswordHandler = catchAsync(async (req, res) => {
+  console.log("Confirming password by user", req.body);
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found.",
+    });
+  }
+
+  const isPasswordCorrect = await user.correctPassword(password);
+
+  if (!isPasswordCorrect) {
+    console.log("Incorrect");
+    return res.status(401).json({
+      message: "Incorrect password.",
+    });
+  }
+
+  console.log("Correct");
+
+  res.status(200).json({
+    message: "Password confirmed.",
+  });
 });
