@@ -128,11 +128,15 @@ exports.addPhaseByUserHandler = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllPhaseByUserHandler = catchAsync(async (req, res, next) => {
-  console.log("Getting Phase by user");
+  console.log("Getting Phase by user", req.params);
 
   const { email } = req.params;
   const phases = await UserPhase.findOne({ email });
-
+  if (!phases || phases.length === 0) {
+    return res.status(404).json({
+      message: "No phase found for this user",
+    });
+  }
   res.status(200).json({
     data: phases,
   });
@@ -160,39 +164,45 @@ exports.deletePhaseByUserHandler = catchAsync(async (req, res) => {
 exports.addPatternByUserHandler = catchAsync(async (req, res) => {
   console.log("Adding pattern by user", req.body);
 
-  const { email, patternName, selectedPhases } = req.body;
+  const { email, name, configuredPhases } = req.body;
 
+  // Ensure the user exists
   const user = await UserPhase.findOne({ email });
-  const userPhasesID = user.phases.map((phase) => phase._id.toString());
-
-  const allPhasesValid = selectedPhases.every((phaseId) =>
-    userPhasesID.includes(phaseId)
-  );
-
-  if (!allPhasesValid) {
-    return res.status(400).json({
-      message: "One or more phases are invalid!",
-    });
+  if (!user) {
+    return res.status(404).json({ message: "User not found!" });
   }
 
   // Ensure no duplicate pattern name
   const existingPattern = await UserPattern.findOne({
     email,
-    "patterns.name": patternName,
+    "patterns.name": name,
   });
 
   if (existingPattern) {
     return res.status(400).json({
-      message: `Pattern name "${patternName}" already exists!`,
+      message: `Pattern name "${name}" already exists!`,
     });
   }
 
-  // Create the new pattern
+  // Create the new pattern with the phases data
   const pattern = {
-    name: patternName,
-    phases: selectedPhases,
+    name: name,
+    phases: configuredPhases.map((phase) => ({
+      name: phase.name,
+      phaseId: phase.phaseId,
+      signalString: phase.signalString,
+      signalData: phase.signalData,
+      duration: phase.duration,
+      blinkEnabled: phase.blinkEnabled,
+      blinkTimeRedToGreen: phase.blinkTimeRedToGreen,
+      blinkTimeGreenToRed: phase.blinkTimeGreenToRed,
+      amberEnabled: phase.amberEnabled,
+      amberDurationRedToGreen: phase.amberDurationRedToGreen,
+      amberDurationGreenToRed: phase.amberDurationGreenToRed,
+    })),
   };
 
+  // Add the pattern to the database
   await UserPattern.findOneAndUpdate(
     { email },
     { $push: { patterns: pattern } },
@@ -200,7 +210,7 @@ exports.addPatternByUserHandler = catchAsync(async (req, res) => {
   );
 
   res.status(201).json({
-    message: `Pattern "${patternName}" added successfully!`,
+    message: `Pattern "${name}" added successfully!`,
   });
 });
 
@@ -208,32 +218,29 @@ exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
   console.log("Getting all patterns by user", req.params);
   const { email } = req.params;
 
-  const userPhases = await UserPhase.findOne({ email });
-
-  if (!userPhases) {
-    return res.status(404).json({ message: "No phases found for this user" });
-  }
-
+  // Find user pattern by email
   const userPatterns = await UserPattern.findOne({ email });
 
   if (!userPatterns) {
-    return res.status(404).json({ message: "No patterns found for this user" });
+    return res.status(404).json({ message: "No pattern found for this user" });
   }
-
-  const populatedPatterns = userPatterns.patterns.map((pattern) => {
-    const populatedPhases = pattern.phases
-      .map((phaseId) =>
-        userPhases.phases.find(
-          (phase) => phase._id.toString() === phaseId.toString()
-        )
-      )
-      .filter((phase) => phase);
-
-    return {
-      ...pattern.toObject(),
-      phases: populatedPhases,
-    };
-  });
+  // Patterns are already populated with detailed phase information, so no additional lookup is required.
+  const populatedPatterns = userPatterns.patterns.map((pattern) => ({
+    name: pattern.name,
+    phases: pattern.phases.map((phase) => ({
+      name: phase.name,
+      phaseId: phase.phaseId,
+      signalString: phase.signalString,
+      signalData: phase.signalData,
+      duration: phase.duration,
+      blinkEnabled: phase.blinkEnabled,
+      blinkTimeRedToGreen: phase.blinkTimeRedToGreen,
+      blinkTimeGreenToRed: phase.blinkTimeGreenToRed,
+      amberEnabled: phase.amberEnabled,
+      amberDurationRedToGreen: phase.amberDurationRedToGreen,
+      amberDurationGreenToRed: phase.amberDurationGreenToRed,
+    })),
+  }));
 
   res.status(200).json({
     data: {
@@ -281,12 +288,6 @@ exports.addGroupByUserHandler = catchAsync(async (req, res) => {
       name: pattern.name,
       startTime: pattern.startTime,
       endTime: pattern.endTime,
-      phases: pattern.phases.map((phase) => ({
-        name: phase.name,
-        phaseId: phase.phaseId,
-        phaseData: phase.phaseData,
-        duration: phase.duration,
-      })),
     })),
   });
 
@@ -304,10 +305,9 @@ exports.getAllGroupsByUserHandler = catchAsync(async (req, res, next) => {
 
   if (!groups || groups.length === 0) {
     return res.status(404).json({
-      message: "No groups found for this user",
+      message: "No group found for this user",
     });
   }
-  console.log("Gropus", groups);
   res.status(200).json({
     data: groups,
   });

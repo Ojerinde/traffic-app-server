@@ -45,9 +45,17 @@ const userPatternSchema = new Schema({
       name: { type: String, required: true },
       phases: [
         {
-          type: Schema.Types.ObjectId,
-          ref: "UserPhase",
-          required: true,
+          name: { type: String, required: true },
+          phaseId: { type: String, required: true },
+          signalString: { type: String, required: true },
+          signalData: { type: String, required: true },
+          duration: { type: Number, required: true },
+          blinkEnabled: { type: Boolean, default: false },
+          blinkTimeRedToGreen: { type: Number, min: 0, max: 5, default: 2 }, // Blink duration Red -> Green
+          blinkTimeGreenToRed: { type: Number, min: 0, max: 5, default: 2 }, // Blink duration Green -> Red
+          amberEnabled: { type: Boolean, default: false },
+          amberDurationRedToGreen: { type: Number, min: 2, max: 5, default: 3 }, // Amber duration Red -> Green
+          amberDurationGreenToRed: { type: Number, min: 2, max: 5, default: 3 }, // Amber duration Green -> Red
         },
       ],
     },
@@ -77,26 +85,6 @@ const userGroupSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      phases: [
-        {
-          name: {
-            type: String,
-            required: true,
-          },
-          phaseId: {
-            type: String,
-            required: true,
-          },
-          phaseData: {
-            type: String,
-            required: true,
-          },
-          duration: {
-            type: String,
-            required: true,
-          },
-        },
-      ],
     },
   ],
 });
