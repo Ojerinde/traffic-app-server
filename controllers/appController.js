@@ -164,7 +164,17 @@ exports.deletePhaseByUserHandler = catchAsync(async (req, res) => {
 exports.addPatternByUserHandler = catchAsync(async (req, res) => {
   console.log("Adding pattern by user", req.body);
 
-  const { email, name, configuredPhases } = req.body;
+  const {
+    email,
+    name,
+    configuredPhases,
+    blinkEnabled,
+    blinkTimeRedToGreen,
+    blinkTimeGreenToRed,
+    amberEnabled,
+    amberDurationRedToGreen,
+    amberDurationGreenToRed,
+  } = req.body;
 
   // Ensure the user exists
   const user = await UserPhase.findOne({ email });
@@ -184,21 +194,19 @@ exports.addPatternByUserHandler = catchAsync(async (req, res) => {
     });
   }
 
-  // Create the new pattern with the phases data
   const pattern = {
-    name: name,
-    phases: configuredPhases.map((phase) => ({
+    name,
+    blinkEnabled,
+    blinkTimeRedToGreen,
+    blinkTimeGreenToRed,
+    amberEnabled,
+    amberDurationRedToGreen,
+    amberDurationGreenToRed,
+    configuredPhases: configuredPhases.map((phase) => ({
       name: phase.name,
       phaseId: phase.phaseId,
       signalString: phase.signalString,
-      signalData: phase.signalData,
       duration: phase.duration,
-      blinkEnabled: phase.blinkEnabled,
-      blinkTimeRedToGreen: phase.blinkTimeRedToGreen,
-      blinkTimeGreenToRed: phase.blinkTimeGreenToRed,
-      amberEnabled: phase.amberEnabled,
-      amberDurationRedToGreen: phase.amberDurationRedToGreen,
-      amberDurationGreenToRed: phase.amberDurationGreenToRed,
     })),
   };
 
@@ -224,21 +232,20 @@ exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
   if (!userPatterns) {
     return res.status(404).json({ message: "No pattern found for this user" });
   }
-  // Patterns are already populated with detailed phase information, so no additional lookup is required.
+
   const populatedPatterns = userPatterns.patterns.map((pattern) => ({
     name: pattern.name,
-    phases: pattern.phases.map((phase) => ({
+    blinkEnabled: pattern.blinkEnabled,
+    blinkTimeRedToGreen: pattern.blinkTimeRedToGreen,
+    blinkTimeGreenToRed: pattern.blinkTimeGreenToRed,
+    amberEnabled: pattern.amberEnabled,
+    amberDurationRedToGreen: pattern.amberDurationRedToGreen,
+    amberDurationGreenToRed: pattern.amberDurationGreenToRed,
+    configuredPhases: pattern.configuredPhases.map((phase) => ({
       name: phase.name,
       phaseId: phase.phaseId,
       signalString: phase.signalString,
-      signalData: phase.signalData,
       duration: phase.duration,
-      blinkEnabled: phase.blinkEnabled,
-      blinkTimeRedToGreen: phase.blinkTimeRedToGreen,
-      blinkTimeGreenToRed: phase.blinkTimeGreenToRed,
-      amberEnabled: phase.amberEnabled,
-      amberDurationRedToGreen: phase.amberDurationRedToGreen,
-      amberDurationGreenToRed: phase.amberDurationGreenToRed,
     })),
   }));
 

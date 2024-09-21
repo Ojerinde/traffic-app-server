@@ -43,19 +43,18 @@ const userPatternSchema = new Schema({
   patterns: [
     {
       name: { type: String, required: true },
-      phases: [
+      blinkEnabled: { type: Boolean, default: false },
+      blinkTimeRedToGreen: { type: Number, min: 1, max: 5, default: 1 },
+      blinkTimeGreenToRed: { type: Number, min: 1, max: 5, default: 2 },
+      amberEnabled: { type: Boolean, default: true },
+      amberDurationRedToGreen: { type: Number, min: 1, max: 5, default: 3 },
+      amberDurationGreenToRed: { type: Number, min: 1, max: 5, default: 3 },
+      configuredPhases: [
         {
           name: { type: String, required: true },
           phaseId: { type: String, required: true },
           signalString: { type: String, required: true },
-          signalData: { type: String, required: true },
           duration: { type: Number, required: true },
-          blinkEnabled: { type: Boolean, default: false },
-          blinkTimeRedToGreen: { type: Number, min: 0, max: 5, default: 2 }, // Blink duration Red -> Green
-          blinkTimeGreenToRed: { type: Number, min: 0, max: 5, default: 2 }, // Blink duration Green -> Red
-          amberEnabled: { type: Boolean, default: false },
-          amberDurationRedToGreen: { type: Number, min: 2, max: 5, default: 3 }, // Amber duration Red -> Green
-          amberDurationGreenToRed: { type: Number, min: 2, max: 5, default: 3 }, // Amber duration Green -> Red
         },
       ],
     },
