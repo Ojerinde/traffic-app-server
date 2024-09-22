@@ -308,15 +308,41 @@ exports.getAllGroupsByUserHandler = catchAsync(async (req, res, next) => {
   console.log("Getting all groups by user", req.params);
   const { email } = req.params;
 
-  const groups = await UserGroup.find({ email });
+  // Fetch user groups and use .lean() to return plain JavaScript objects
+  const groups = await UserGroup.find({ email }).lean();
 
   if (!groups || groups.length === 0) {
     return res.status(404).json({
       message: "No group found for this user",
     });
   }
+
+  const userPatterns = await UserPattern.findOne({ email }).lean();
+
+  const enrichedGroups = groups.map((group) => {
+    const enrichedPatterns = group.patterns.map((groupPattern) => {
+      const correspondingPattern = userPatterns.patterns.find(
+        (pattern) => pattern.name === groupPattern.name
+      );
+
+      if (correspondingPattern) {
+        return {
+          ...groupPattern,
+          ...correspondingPattern,
+        };
+      }
+
+      return groupPattern;
+    });
+
+    return {
+      ...group,
+      patterns: enrichedPatterns,
+    };
+  });
+
   res.status(200).json({
-    data: groups,
+    data: enrichedGroups,
   });
 });
 
