@@ -61,42 +61,13 @@ const userPatternSchema = new Schema({
   ],
 });
 
-const userGroupSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  patterns: [
-    {
-      name: {
-        type: String,
-        required: true,
-      },
-      startTime: {
-        type: String,
-        required: true,
-      },
-      endTime: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
-});
-
 // Create models
 const UserDevice = mongoose.model("UserDevice", userDeviceSchema);
 const UserPhase = mongoose.model("UserPhase", userPhaseSchema);
 const UserPattern = mongoose.model("UserPattern", userPatternSchema);
-const UserGroup = mongoose.model("UserGroup", userGroupSchema);
 
 module.exports = {
   UserDevice,
   UserPhase,
   UserPattern,
-  UserGroup,
 };

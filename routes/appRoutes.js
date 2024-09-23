@@ -20,13 +20,6 @@ router.delete(
   appController.deletePatternByUserHandler
 );
 
-router.post("/groups", appController.addGroupByUserHandler);
-router.get("/groups/:email", appController.getAllGroupsByUserHandler);
-router.delete(
-  "/groups/:groupId/:email",
-  appController.deleteGroupByUserHandler
-);
-
 router.post("/confirm-password", appController.confirmPasswordHandler);
 
 module.exports = router;
