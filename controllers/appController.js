@@ -368,6 +368,25 @@ exports.getAllPlansByUserHandler = catchAsync(async (req, res, next) => {
 exports.deletePlanByUserHandler = catchAsync(async (req, res) => {
   console.log("Deleting plan by user", req.params);
   const { planId, email } = req.params;
+
+  const userPlan = await UserPlan.findOne({ email });
+
+  const planIndex = userPlan.plans.findIndex((plan) => plan.id === planId);
+
+  if (planIndex === -1) {
+    return res.status(404).json({
+      status: "error",
+      message: "Plan not found for this user.",
+    });
+  }
+
+  userPlan.plans.splice(planIndex, 1);
+
+  await userPlan.save();
+
+  res.status(200).json({
+    message: `Plan deleted successfully!`,
+  });
 });
 exports.confirmPasswordHandler = catchAsync(async (req, res) => {
   console.log("Confirming password by user", req.body);
