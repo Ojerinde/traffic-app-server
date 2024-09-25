@@ -55,19 +55,46 @@ const userPatternSchema = new Schema({
           phaseId: { type: String, required: true },
           signalString: { type: String, required: true },
           duration: { type: Number, required: true },
+          id: { type: Number, required: true },
         },
       ],
     },
   ],
 });
 
+const userPlanSchema = new Schema(
+  {
+    email: { type: String, required: true, unique: true },
+    plans: [
+      {
+        id: { type: String, required: true },
+        name: { type: String, required: true },
+        dayType: { type: String, required: true },
+        schedule: {
+          type: Map,
+          of: new Schema(
+            {
+              value: { type: String, required: true },
+              label: { type: String, required: true },
+            },
+            { _id: false }
+          ),
+        },
+        customDate: { type: Date, default: null },
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
 // Create models
 const UserDevice = mongoose.model("UserDevice", userDeviceSchema);
 const UserPhase = mongoose.model("UserPhase", userPhaseSchema);
 const UserPattern = mongoose.model("UserPattern", userPatternSchema);
-
+const UserPlan = mongoose.model("UserPlan", userPlanSchema);
 module.exports = {
   UserDevice,
   UserPhase,
   UserPattern,
+  UserPlan,
 };

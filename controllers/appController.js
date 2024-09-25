@@ -4,6 +4,7 @@ const {
   UserPhase,
   UserPattern,
   UserGroup,
+  UserPlan,
 } = require("../models/appModel");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
@@ -202,11 +203,12 @@ exports.addPatternByUserHandler = catchAsync(async (req, res) => {
     amberEnabled,
     amberDurationRedToGreen,
     amberDurationGreenToRed,
-    configuredPhases: configuredPhases.map((phase) => ({
+    configuredPhases: configuredPhases.map((phase, index) => ({
       name: phase.name,
       phaseId: phase.phaseId,
       signalString: phase.signalString,
       duration: phase.duration,
+      id: index,
     })),
   };
 
@@ -246,6 +248,7 @@ exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
       phaseId: phase.phaseId,
       signalString: phase.signalString,
       duration: phase.duration,
+      id: phase.id,
     })),
   }));
 
@@ -258,11 +261,11 @@ exports.getAllPatternsByUserHandler = catchAsync(async (req, res, next) => {
 
 exports.deletePatternByUserHandler = catchAsync(async (req, res) => {
   console.log("Deleting pattern by user", req.params);
-  const { patternId, email } = req.params;
+  const { patternName, email } = req.params;
 
   const updatedUser = await UserPattern.findOneAndUpdate(
     { email },
-    { $pull: { patterns: { _id: patternId } } },
+    { $pull: { patterns: { name: patternName } } },
     { new: true }
   );
 
@@ -275,6 +278,97 @@ exports.deletePatternByUserHandler = catchAsync(async (req, res) => {
   res.status(204).json({ message: "Pattern successfully deleted." });
 });
 
+exports.editPatternByUserHandler = catchAsync(async (req, res) => {
+  console.log("Editing pattern by user", req.params, req.body);
+  const { patternName, email } = req.params;
+  const { configuredPhases } = req.body;
+
+  const patternToUpdate = await UserPattern.findOneAndUpdate(
+    { email, "patterns.name": patternName },
+    {
+      $set: {
+        "patterns.$.configuredPhases": configuredPhases,
+      },
+    },
+    { new: true }
+  );
+
+  if (!patternToUpdate) {
+    return res.status(404).json({
+      message: "Pattern not found or you don't have permission to edit it.",
+    });
+  }
+
+  res.status(200).json({
+    message: `Pattern "${patternName}" updated successfully!`,
+    pattern: patternToUpdate,
+  });
+});
+
+exports.addPlanByUserHandler = catchAsync(async (req, res) => {
+  console.log("Adding plan by user", req.body);
+  const { id, name, email, schedule, dayType, customDate } = req.body;
+
+  let userPlan = await UserPlan.findOne({ email });
+
+  if (!userPlan) {
+    userPlan = new UserPlan({ email, plans: [] });
+  } else {
+    const planExists = userPlan.plans.some((plan) => plan.name === name);
+    if (planExists) {
+      return res.status(400).json({
+        status: "error",
+        message: "A plan with this name already exists for this user.",
+      });
+    }
+  }
+
+  const newPlan = {
+    id,
+    name,
+    dayType,
+    schedule,
+    customDate,
+  };
+
+  userPlan.plans.push(newPlan);
+
+  await userPlan.save();
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      message: `Plan "${name}" added successfully!`,
+      plan: newPlan,
+    },
+  });
+});
+
+exports.getAllPlansByUserHandler = catchAsync(async (req, res, next) => {
+  console.log("Getting all plans by user", req.params);
+
+  const { email } = req.params;
+  const userPlan = await UserPlan.findOne({ email });
+
+  if (!userPlan) {
+    return res.status(404).json({
+      status: "error",
+      message: "No plans found for this user.",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      plans: userPlan.plans,
+    },
+  });
+});
+
+exports.deletePlanByUserHandler = catchAsync(async (req, res) => {
+  console.log("Deleting plan by user", req.params);
+  const { planId, email } = req.params;
+});
 exports.confirmPasswordHandler = catchAsync(async (req, res) => {
   console.log("Confirming password by user", req.body);
   const { email, password } = req.body;

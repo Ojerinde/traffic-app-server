@@ -16,9 +16,17 @@ router.delete(
 router.post("/patterns", appController.addPatternByUserHandler);
 router.get("/patterns/:email", appController.getAllPatternsByUserHandler);
 router.delete(
-  "/patterns/:patternId/:email",
+  "/patterns/:patternName/:email",
   appController.deletePatternByUserHandler
 );
+router.put(
+  "/patterns/:patternName/:email",
+  appController.editPatternByUserHandler
+);
+
+router.post("/plans", appController.addPlanByUserHandler);
+router.get("/plans/:email", appController.getAllPlansByUserHandler);
+router.delete("/plans/:planId/:email", appController.deletePlanByUserHandler);
 
 router.post("/confirm-password", appController.confirmPasswordHandler);
 
