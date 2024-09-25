@@ -336,11 +336,8 @@ exports.addPlanByUserHandler = catchAsync(async (req, res) => {
   await userPlan.save();
 
   res.status(201).json({
-    status: "success",
-    data: {
-      message: `Plan "${name}" added successfully!`,
-      plan: newPlan,
-    },
+    message: `Plan "${name}" added successfully!`,
+    plan: newPlan,
   });
 });
 
