@@ -33,6 +33,7 @@ function initWebSocketServer() {
 
     ws.on("message", (message) => {
       const data = JSON.parse(message);
+      console.log(data, "recieved form hardware");
       console.log(`${data?.event} event received from client`);
 
       switch (data?.event) {
