@@ -4,6 +4,8 @@ require("dotenv").config();
 
 const app = require("./app");
 const connectToMongoDB = require("./db");
+const { typeDataHandler } = require("./handlers/typeHandler");
+const { signalDataHandler } = require("./handlers/signHandler");
 
 const PORT = process.env.PORT || 5000;
 
@@ -23,30 +25,51 @@ function initWebSocketServer() {
 
     ws.on("message", (message) => {
       const data = JSON.parse(message);
-      console.log(`${data?.event} event received from client`);
 
-      switch (data?.event) {
-        case "identify":
-          if (data.clientType) ws.clientType = data.clientType;
-          console.log(`Client identified as: ${ws.clientType}`);
-          break;
+      // Web application logic
+      if (data.event) {
+        console.log(data?.event, "recieved form client");
+        switch (data?.event) {
+          case "identify":
+            if (data.clientType) ws.clientType = data.clientType;
+            console.log(`Client identified as: ${ws.clientType}`);
+            break;
 
-        default:
-          console.log("Unknown event:", data.event);
+          default:
+            console.log("Unknown event:", data.event);
+        }
+      }
+
+      // Hardware logic
+      if (data?.Event === "data") {
+        console.log(`${data?.Type} data received from hardware`);
+        switch (data?.Type) {
+          case "info":
+            typeDataHandler(ws, wss.clients, data?.Param);
+            break;
+          case "sign":
+            signalDataHandler(ws, wss.clients, data?.Param);
+            break;
+          case "state":
+            console.log(`State Param`, data?.Param);
+            break;
+
+          default:
+            console.log("Unknown event:", data?.Event);
+        }
       }
     });
 
-    ws.on("ping", (event) => {
-      console.log("Received ping from hardware", event);
+    ws.on("ping", (buffer) => {
+      const idUtf8 = buffer.toString("utf8");
 
       const message = JSON.stringify({
         event: "ping_received",
-        source: "hardware",
+        source: { type: "hardware", id: idUtf8 },
         timestamp: new Date(),
       });
 
       wss.clients.forEach((client) => {
-        console.log("client", client.clientType);
         if (
           client.readyState === WebSocket.OPEN &&
           client.clientType !== null

@@ -5,6 +5,8 @@ require("dotenv").config();
 
 const app = require("./app");
 const connectToMongoDB = require("./db");
+const { typeDataHandler } = require("./handlers/typeHandler");
+const { signalDataHandler } = require("./handlers/signHandler");
 
 const PORT = 443;
 
@@ -33,48 +35,42 @@ function initWebSocketServer() {
 
     ws.on("message", (message) => {
       const data = JSON.parse(message);
-      console.log(data, "recieved form hardware");
-      console.log(`${data?.Event} event received from client`);
-
-      // Hardware logic
-      let eventName = data?.Event;
-      let Type = undefined;
-
-      if (eventName) {
-        Type = data?.Type;
-      }
 
       // Web application logic
-      switch (data?.event) {
-        case "identify":
-          if (data.clientType) ws.clientType = data.clientType;
-          console.log(`Client identified as: ${ws.clientType}`);
-          break;
+      if (data.event) {
+        console.log(data?.event, "recieved form client");
+        switch (data?.event) {
+          case "identify":
+            if (data.clientType) ws.clientType = data.clientType;
+            console.log(`Client identified as: ${ws.clientType}`);
+            break;
 
-        default:
-          console.log("Unknown event:", data.event);
+          default:
+            console.log("Unknown event:", data.event);
+        }
       }
 
       // Hardware logic
-      switch (Type) {
-        case "info":
-          console.log(`Info Param`, data?.Param);
-          break;
-        case "sign":
-          console.log(`Sign Param`, data?.Param);
-          break;
-        case "state":
-          console.log(`State Param`, data?.Param);
-          break;
+      if (data?.Event === "data") {
+        console.log(`${data?.Type} data received from hardware`);
+        switch (data?.Type) {
+          case "info":
+            typeDataHandler(ws, wss.clients, data?.Param);
+            break;
+          case "sign":
+            signalDataHandler(ws, wss.clients, data?.Param);
+            break;
+          case "state":
+            console.log(`State Param`, data?.Param);
+            break;
 
-        default:
-          console.log("Unknown event:", data.event);
+          default:
+            console.log("Unknown event:", data?.Event);
+        }
       }
     });
 
     ws.on("ping", (buffer) => {
-      console.log("Received ping from hardware", buffer);
-
       const idUtf8 = buffer.toString("utf8");
 
       const message = JSON.stringify({
@@ -84,7 +80,6 @@ function initWebSocketServer() {
       });
 
       wss.clients.forEach((client) => {
-        console.log("client", client.clientType);
         if (
           client.readyState === WebSocket.OPEN &&
           client.clientType !== null
