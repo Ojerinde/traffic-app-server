@@ -34,12 +34,37 @@ function initWebSocketServer() {
     ws.on("message", (message) => {
       const data = JSON.parse(message);
       console.log(data, "recieved form hardware");
-      console.log(`${data?.event} event received from client`);
+      console.log(`${data?.Event} event received from client`);
 
+      // Hardware logic
+      let eventName = data?.Event;
+      let Type = undefined;
+
+      if (eventName) {
+        Type = data?.Type;
+      }
+
+      // Web application logic
       switch (data?.event) {
         case "identify":
           if (data.clientType) ws.clientType = data.clientType;
           console.log(`Client identified as: ${ws.clientType}`);
+          break;
+
+        default:
+          console.log("Unknown event:", data.event);
+      }
+
+      // Hardware logic
+      switch (Type) {
+        case "info":
+          console.log(`Info Param`, data?.Param);
+          break;
+        case "sign":
+          console.log(`Sign Param`, data?.Param);
+          break;
+        case "state":
+          console.log(`State Param`, data?.Param);
           break;
 
         default:
