@@ -18,7 +18,7 @@ function initWebSocketServer() {
   wss = new WebSocket.Server({ server: httpServer, path: "/ws" });
 
   wss.on("connection", (ws) => {
-    console.log("A client is connected");
+    console.log("A client device is connected to the server");
 
     // Temporary property to store client type
     ws.clientType = null;
@@ -31,8 +31,8 @@ function initWebSocketServer() {
         console.log(data?.event, "recieved form client");
         switch (data?.event) {
           case "identify":
-            if (data.clientType) ws.clientType = data.clientType;
-            console.log(`Client identified as: ${ws.clientType}`);
+            console.log(`Client identified as:`, data);
+            ws.clientType = data.clientID;
             break;
 
           default:
@@ -44,6 +44,12 @@ function initWebSocketServer() {
       if (data?.Event === "data") {
         console.log(`${data?.Type} data received from hardware`);
         switch (data?.Type) {
+          case "identify":
+            console.log(`Hardware identified as:`, data.Param.ClientID);
+            ws.clientType = data.Param.ClientID;
+            console.log(ws.clientType);
+
+            break;
           case "info":
             typeDataHandler(ws, wss.clients, data?.Param);
             break;
