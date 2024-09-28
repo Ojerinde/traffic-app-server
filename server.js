@@ -45,8 +45,8 @@ function initWebSocketServer() {
         console.log(`${data?.Type} data received from hardware`);
         switch (data?.Type) {
           case "identify":
-            console.log(`Hardware identified as:`, data.Param.ClientID);
-            ws.clientType = data.Param.ClientID;
+            console.log(`Hardware identified as:`, data.Param.DeviceID);
+            ws.clientType = data.Param.DeviceID;
             console.log(ws.clientType);
 
             break;
