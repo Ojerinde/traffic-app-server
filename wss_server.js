@@ -41,8 +41,8 @@ function initWebSocketServer() {
         console.log(data?.event, "recieved form client");
         switch (data?.event) {
           case "identify":
-            if (data.clientType) ws.clientType = data.clientType;
-            console.log(`Client identified as: ${ws.clientType}`);
+            console.log(`Client identified as:`, data);
+            ws.clientType = data.clientID;
             break;
 
           default:
@@ -54,6 +54,12 @@ function initWebSocketServer() {
       if (data?.Event === "data") {
         console.log(`${data?.Type} data received from hardware`);
         switch (data?.Type) {
+          case "identify":
+            console.log(`Hardware identified as:`, data.Param.ClientID);
+            ws.clientType = data.Param.ClientID;
+            console.log(ws.clientType);
+
+            break;
           case "info":
             typeDataHandler(ws, wss.clients, data?.Param);
             break;

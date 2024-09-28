@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 
 exports.typeDataHandler = catchAsync(async (ws, clients, payload) => {
-  console.log("Received info data from Hardware", payload, clients.size);
+  console.log("Received info data from Hardware", payload);
   return clients.forEach((client) => {
     console.log(ws.clientType, payload.ClientID);
     if (client.clientType === payload.ClientID) return;
