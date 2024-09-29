@@ -5,6 +5,8 @@ const {
   UserPattern,
   UserGroup,
   UserPlan,
+  UserDeviceState,
+  UserDeviceActivity,
 } = require("../models/appModel");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
@@ -385,6 +387,7 @@ exports.deletePlanByUserHandler = catchAsync(async (req, res) => {
     message: `Plan deleted successfully!`,
   });
 });
+
 exports.confirmPasswordHandler = catchAsync(async (req, res) => {
   console.log("Confirming password by user", req.body);
   const { email, password } = req.body;
@@ -410,5 +413,39 @@ exports.confirmPasswordHandler = catchAsync(async (req, res) => {
 
   res.status(200).json({
     message: "Password confirmed.",
+  });
+});
+
+exports.getDeviceActivityByDeviceIDHandler = catchAsync(async (req, res) => {
+  const { deviceID } = req.params;
+
+  const activity = await UserDeviceActivity.findOne({ DeviceID: deviceID });
+
+  if (!activity) {
+    return res.status(404).json({
+      message: "Device activity not found.",
+    });
+  }
+
+  res.status(200).json({
+    message: "Device activity fetched successfully.",
+    data: activity,
+  });
+});
+
+exports.getDeviceStateByDeviceIDHandler = catchAsync(async (req, res) => {
+  const { deviceID } = req.params;
+
+  const state = await UserDeviceState.findOne({ DeviceID: deviceID });
+
+  if (!state) {
+    return res.status(404).json({
+      message: "Device state not found.",
+    });
+  }
+
+  res.status(200).json({
+    message: "Device state fetched successfully.",
+    data: state,
   });
 });

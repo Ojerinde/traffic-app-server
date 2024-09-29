@@ -6,6 +6,8 @@ const app = require("./app");
 const connectToMongoDB = require("./db");
 const { typeDataHandler } = require("./handlers/typeHandler");
 const { signalDataHandler } = require("./handlers/signHandler");
+const { deviceStateHandler } = require("./handlers/stateHandler");
+const { activityHandler } = require("./handlers/progHandler");
 
 const PORT = process.env.PORT || 5000;
 
@@ -57,7 +59,10 @@ function initWebSocketServer() {
             signalDataHandler(ws, wss.clients, data?.Param);
             break;
           case "state":
-            console.log(`State Param`, data?.Param);
+            deviceStateHandler(ws, wss.clients, data?.Param);
+            break;
+          case "prog":
+            activityHandler(ws, wss.clients, data?.Param);
             break;
 
           default:

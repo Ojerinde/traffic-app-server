@@ -87,14 +87,53 @@ const userPlanSchema = new Schema(
   { timestamps: true }
 );
 
+const userDeviceStateSchema = new Schema({
+  DeviceID: { type: String, required: true },
+  Auto: {
+    type: Boolean,
+    required: true,
+  },
+  Power: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const userDeviceActivitySchema = new Schema({
+  DeviceID: { type: String, required: true },
+  Plan: {
+    type: String,
+    required: true,
+  },
+  Period: {
+    type: String,
+    required: true,
+  },
+  JunctionId: {
+    type: String,
+    required: true,
+  },
+});
+
 // Create models
 const UserDevice = mongoose.model("UserDevice", userDeviceSchema);
 const UserPhase = mongoose.model("UserPhase", userPhaseSchema);
 const UserPattern = mongoose.model("UserPattern", userPatternSchema);
 const UserPlan = mongoose.model("UserPlan", userPlanSchema);
+const UserDeviceState = mongoose.model(
+  "UserDeviceState",
+  userDeviceStateSchema
+);
+const UserDeviceActivity = mongoose.model(
+  "UserDeviceActivity",
+  userDeviceActivitySchema
+);
+
 module.exports = {
   UserDevice,
   UserPhase,
   UserPattern,
   UserPlan,
+  UserDeviceState,
+  UserDeviceActivity,
 };

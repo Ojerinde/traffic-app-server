@@ -30,4 +30,10 @@ router.delete("/plans/:planId/:email", appController.deletePlanByUserHandler);
 
 router.post("/confirm-password", appController.confirmPasswordHandler);
 
+router.get(
+  "/activity/:deviceID",
+  appController.getDeviceActivityByDeviceIDHandler
+);
+router.get("/state/:deviceID", appController.getDeviceStateByDeviceIDHandler);
+
 module.exports = router;
