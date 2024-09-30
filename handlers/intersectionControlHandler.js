@@ -9,7 +9,8 @@ exports.intersectionControlRequestHandler = catchAsync(
     const deviceState = await UserDeviceState.findOne({
       DeviceID: payload.DeviceID,
     });
-    // check the action and send the appropriate message to the hardware
+
+    // Check the action and send the appropriate message to the hardware
 
     return clients.forEach((client) => {
       if (client.clientType !== payload.DeviceID) return;
