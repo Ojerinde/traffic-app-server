@@ -66,7 +66,10 @@ function initWebSocketServer() {
             signalDataHandler(ws, wss.clients, data?.Param);
             break;
           case "state":
-            console.log(`State Param`, data?.Param);
+            deviceStateHandler(ws, wss.clients, data?.Param);
+            break;
+          case "prog":
+            activityHandler(ws, wss.clients, data?.Param);
             break;
 
           default:
@@ -87,7 +90,7 @@ function initWebSocketServer() {
       wss.clients.forEach((client) => {
         if (
           client.readyState === WebSocket.OPEN &&
-          client.clientType !== null
+          client.clientType !== idUtf8
         ) {
           client.send(message);
         }
