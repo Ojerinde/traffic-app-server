@@ -34,6 +34,7 @@ router.get(
   "/activity/:deviceID",
   appController.getDeviceActivityByDeviceIDHandler
 );
+router.get("/info/:deviceID", appController.getDeviceInfoByDeviceIDHandler);
 router.get("/state/:deviceID", appController.getDeviceStateByDeviceIDHandler);
 
 module.exports = router;

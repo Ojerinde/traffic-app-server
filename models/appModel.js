@@ -97,6 +97,26 @@ const userDeviceStateSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  Manual: {
+    type: Boolean,
+    required: true,
+  },
+  Next: {
+    type: Boolean,
+    required: true,
+  },
+  Hold: {
+    type: Boolean,
+    required: true,
+  },
+  Reset: {
+    type: Boolean,
+    required: true,
+  },
+  Restart: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const userDeviceActivitySchema = new Schema({
@@ -115,6 +135,22 @@ const userDeviceActivitySchema = new Schema({
   },
 });
 
+const userDeviceInfoSchema = new Schema({
+  DeviceID: { type: String, required: true },
+  Bat: {
+    type: String,
+    required: true,
+  },
+  Temp: {
+    type: String,
+    required: true,
+  },
+  Rtc: {
+    type: String,
+    required: true,
+  },
+});
+
 // Create models
 const UserDevice = mongoose.model("UserDevice", userDeviceSchema);
 const UserPhase = mongoose.model("UserPhase", userPhaseSchema);
@@ -128,6 +164,7 @@ const UserDeviceActivity = mongoose.model(
   "UserDeviceActivity",
   userDeviceActivitySchema
 );
+const UserDeviceInfo = mongoose.model("UserDeviceInfo", userDeviceInfoSchema);
 
 module.exports = {
   UserDevice,
@@ -136,4 +173,5 @@ module.exports = {
   UserPlan,
   UserDeviceState,
   UserDeviceActivity,
+  UserDeviceInfo,
 };

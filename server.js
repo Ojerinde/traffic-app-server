@@ -4,12 +4,12 @@ require("dotenv").config();
 
 const app = require("./app");
 const connectToMongoDB = require("./db");
-const {
-  infoDataHandler,
-  infoDataRequestHandler,
-} = require("./handlers/infoHandler");
+const { infoDataHandler } = require("./handlers/infoHandler");
 const { signalDataHandler } = require("./handlers/signHandler");
-const { deviceStateHandler } = require("./handlers/stateHandler");
+const {
+  deviceStateHandler,
+  stateDataRequestHandler,
+} = require("./handlers/stateHandler");
 const { activityHandler } = require("./handlers/progHandler");
 const {
   intersectionControlRequestHandler,
@@ -42,8 +42,8 @@ function initWebSocketServer() {
             console.log(`Client identified as:`, data);
             ws.clientType = data.clientID;
             break;
-          case "info_request":
-            infoDataRequestHandler(ws, wss.clients, data?.payload);
+          case "state_request":
+            stateDataRequestHandler(ws, wss.clients, data?.payload);
             break;
           case "intersection_control_request":
             intersectionControlRequestHandler(ws, wss.clients, data?.payload);
@@ -62,7 +62,6 @@ function initWebSocketServer() {
             console.log(`Hardware identified as:`, data.Param.DeviceID);
             ws.clientType = data.Param.DeviceID;
             console.log(ws.clientType);
-
             break;
           case "info":
             infoDataHandler(ws, wss.clients, data?.Param);

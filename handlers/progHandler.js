@@ -25,11 +25,6 @@ exports.activityHandler = catchAsync(async (ws, clients, payload) => {
   }
   return clients.forEach((client) => {
     if (client.clientType === payload.DeviceID) return;
-    console.log(
-      "Sending Prog Message to all clients except for",
-      ws.clientType,
-      payload.DeviceID
-    );
     client.send(
       JSON.stringify({
         event: "prog_feedback",

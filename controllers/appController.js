@@ -7,6 +7,7 @@ const {
   UserPlan,
   UserDeviceState,
   UserDeviceActivity,
+  UserDeviceInfo,
 } = require("../models/appModel");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
@@ -430,6 +431,23 @@ exports.getDeviceActivityByDeviceIDHandler = catchAsync(async (req, res) => {
   res.status(200).json({
     message: "Device activity fetched successfully.",
     data: activity,
+  });
+});
+
+exports.getDeviceInfoByDeviceIDHandler = catchAsync(async (req, res) => {
+  const { deviceID } = req.params;
+
+  const info = await UserDeviceInfo.findOne({ DeviceID: deviceID });
+
+  if (!info) {
+    return res.status(404).json({
+      message: "Device info not found.",
+    });
+  }
+
+  res.status(200).json({
+    message: "Device info fetched successfully.",
+    data: info,
   });
 });
 
