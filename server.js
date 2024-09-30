@@ -4,10 +4,16 @@ require("dotenv").config();
 
 const app = require("./app");
 const connectToMongoDB = require("./db");
-const { typeDataHandler } = require("./handlers/typeHandler");
+const {
+  infoDataHandler,
+  infoDataRequestHandler,
+} = require("./handlers/infoHandler");
 const { signalDataHandler } = require("./handlers/signHandler");
 const { deviceStateHandler } = require("./handlers/stateHandler");
 const { activityHandler } = require("./handlers/progHandler");
+const {
+  intersectionControlRequestHandler,
+} = require("./handlers/intersectionControlHandler");
 
 const PORT = process.env.PORT || 5000;
 
@@ -36,9 +42,15 @@ function initWebSocketServer() {
             console.log(`Client identified as:`, data);
             ws.clientType = data.clientID;
             break;
+          case "info_request":
+            infoDataRequestHandler(ws, wss.clients, data?.payload);
+            break;
+          case "intersection_control_request":
+            intersectionControlRequestHandler(ws, wss.clients, data?.payload);
+            break;
 
           default:
-            console.log("Unknown event:", data.event);
+            console.log("Unknown event from client:", data.event);
         }
       }
 
@@ -53,7 +65,7 @@ function initWebSocketServer() {
 
             break;
           case "info":
-            typeDataHandler(ws, wss.clients, data?.Param);
+            infoDataHandler(ws, wss.clients, data?.Param);
             break;
           case "sign":
             signalDataHandler(ws, wss.clients, data?.Param);
@@ -64,9 +76,8 @@ function initWebSocketServer() {
           case "prog":
             activityHandler(ws, wss.clients, data?.Param);
             break;
-
           default:
-            console.log("Unknown event:", data?.Event);
+            console.log("Unknown event from hardware:", data?.Event);
         }
       }
     });
@@ -83,7 +94,7 @@ function initWebSocketServer() {
       wss.clients.forEach((client) => {
         if (
           client.readyState === WebSocket.OPEN &&
-          client.clientType !== null
+          client.clientType !== idUtf8
         ) {
           client.send(message);
         }
