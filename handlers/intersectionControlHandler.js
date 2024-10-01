@@ -5,14 +5,45 @@ exports.intersectionControlRequestHandler = catchAsync(
   async (ws, clients, payload) => {
     console.log("Received intersection request data from Client", payload);
 
-    // Get the deviceState from the database using the deviceID
+    // Get the deviceState from the database using the DeviceID
     const deviceState = await UserDeviceState.findOne({
       DeviceID: payload.DeviceID,
     });
 
-    // Check the action and send the appropriate message to the hardware
+    if (!deviceState) {
+      console.error(`Device with ID ${payload.DeviceID} not found.`);
+      return;
+    }
 
-    return clients.forEach((client) => {
+    let newActionValue;
+    switch (payload.action) {
+      case "Auto":
+        newActionValue = !deviceState.Auto;
+        break;
+      case "Manual":
+        newActionValue = !deviceState.Manual;
+        break;
+      case "Hold":
+        newActionValue = !deviceState.Hold;
+        break;
+      case "Next":
+        newActionValue = !deviceState.Next;
+        break;
+      case "Restart":
+        newActionValue = !deviceState.Restart;
+        break;
+      case "Power":
+        newActionValue = !deviceState.Power;
+        break;
+      case "Reset":
+        newActionValue = !deviceState.Reset;
+        break;
+      default:
+        console.error(`Unknown action: ${payload.action}`);
+        return;
+    }
+
+    clients.forEach((client) => {
       if (client.clientType !== payload.DeviceID) return;
       client.send(
         JSON.stringify({
@@ -20,7 +51,7 @@ exports.intersectionControlRequestHandler = catchAsync(
           Type: "state",
           Param: {
             DeviceID: payload.DeviceID,
-            Auto: payload.action,
+            [payload.action]: newActionValue,
           },
         })
       );
