@@ -56,7 +56,7 @@ exports.intersectionControlRequestHandler = catchAsync(
           Type: "state",
           Param: {
             DeviceID: payload.DeviceID,
-            [payload.action]: newActionValue,
+            [payload.action]: `${newActionValue}`,
             ...additionalParams,
           },
         })
