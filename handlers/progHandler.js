@@ -24,7 +24,7 @@ exports.activityHandler = catchAsync(async (ws, clients, payload) => {
     console.log(`Created new device activity for DeviceID: ${DeviceID}`);
   }
   return clients.forEach((client) => {
-    if (client.clientType === payload.DeviceID) return;
+    // if (client.clientType === payload.DeviceID) return;
     client.send(
       JSON.stringify({
         event: "prog_feedback",

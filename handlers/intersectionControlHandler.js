@@ -49,7 +49,7 @@ exports.intersectionControlRequestHandler = catchAsync(
     }
 
     clients.forEach((client) => {
-      if (client.clientType !== payload.DeviceID) return;
+      // if (client.clientType !== payload.DeviceID) return;
       client.send(
         JSON.stringify({
           Event: "ctrl",
