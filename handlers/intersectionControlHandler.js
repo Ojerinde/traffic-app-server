@@ -16,12 +16,17 @@ exports.intersectionControlRequestHandler = catchAsync(
     }
 
     let newActionValue;
+    let additionalParams = {};
+
     switch (payload.action) {
       case "Auto":
         newActionValue = !deviceState.Auto;
         break;
       case "Manual":
         newActionValue = !deviceState.Manual;
+        if (payload.duration) additionalParams.duration = payload.duration;
+        if (payload.signalString)
+          additionalParams.signalString = payload.signalString;
         break;
       case "Hold":
         newActionValue = !deviceState.Hold;
@@ -52,6 +57,7 @@ exports.intersectionControlRequestHandler = catchAsync(
           Param: {
             DeviceID: payload.DeviceID,
             [payload.action]: newActionValue,
+            ...additionalParams,
           },
         })
       );
