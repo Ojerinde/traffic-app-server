@@ -20,7 +20,7 @@ exports.infoDataHandler = catchAsync(async (ws, clients, payload) => {
     deviceInfo = await UserDeviceInfo.create({ DeviceID, Bat, Temp, Rtc });
   }
   return clients.forEach((client) => {
-    // if (client.clientType === payload.DeviceID) return;
+    if (client.clientType === payload.DeviceID) return;
     client.send(
       JSON.stringify({
         event: "info_feedback",

@@ -15,6 +15,7 @@ const { activityHandler } = require("./handlers/progHandler");
 const {
   intersectionControlRequestHandler,
 } = require("./handlers/intersectionControlHandler");
+const { uploadRequestHandler } = require("./handlers/uploadHandler");
 
 const PORT = 443;
 
@@ -58,6 +59,10 @@ function initWebSocketServer() {
           case "intersection_control_request":
             intersectionControlRequestHandler(ws, wss.clients, data?.payload);
             break;
+          case "upload_request":
+            uploadRequestHandler(ws, wss.clients, data?.payload);
+            break;
+
           default:
             console.log("Unknown event from client:", data.event);
         }

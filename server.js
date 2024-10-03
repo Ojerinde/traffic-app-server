@@ -14,6 +14,7 @@ const { activityHandler } = require("./handlers/progHandler");
 const {
   intersectionControlRequestHandler,
 } = require("./handlers/intersectionControlHandler");
+const { uploadRequestHandler } = require("./handlers/uploadHandler");
 
 const PORT = process.env.PORT || 5000;
 
@@ -47,6 +48,9 @@ function initWebSocketServer() {
             break;
           case "intersection_control_request":
             intersectionControlRequestHandler(ws, wss.clients, data?.payload);
+            break;
+          case "upload_request":
+            uploadRequestHandler(ws, wss.clients, data?.payload);
             break;
 
           default:

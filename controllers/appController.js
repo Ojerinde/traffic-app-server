@@ -3,7 +3,6 @@ const {
   UserDevice,
   UserPhase,
   UserPattern,
-  UserGroup,
   UserPlan,
   UserDeviceState,
   UserDeviceActivity,
@@ -208,7 +207,7 @@ exports.addPatternByUserHandler = catchAsync(async (req, res) => {
     amberDurationGreenToRed,
     configuredPhases: configuredPhases.map((phase, index) => ({
       name: phase.name,
-      phaseId: phase.phaseId,
+      phaseId: phase.id,
       signalString: phase.signalString,
       duration: phase.duration,
       id: index,
@@ -309,23 +308,17 @@ exports.editPatternByUserHandler = catchAsync(async (req, res) => {
 });
 
 exports.addPlanByUserHandler = catchAsync(async (req, res) => {
-  console.log("Adding plan by user", req.body);
+  console.log("Adding or updating plan by user", req.body);
   const { id, name, email, schedule, dayType, customDate } = req.body;
 
   let userPlan = await UserPlan.findOne({ email });
-
   if (!userPlan) {
     userPlan = new UserPlan({ email, plans: [] });
-  } else {
-    const planExists = userPlan.plans.some((plan) => plan.name === name);
-    if (planExists) {
-      return res.status(400).json({
-        status: "error",
-        message: "A plan with this name already exists for this user.",
-      });
-    }
   }
 
+  const existingPlanIndex = userPlan.plans.findIndex(
+    (plan) => plan.name === name
+  );
   const newPlan = {
     id,
     name,
@@ -334,14 +327,22 @@ exports.addPlanByUserHandler = catchAsync(async (req, res) => {
     customDate,
   };
 
-  userPlan.plans.push(newPlan);
-
-  await userPlan.save();
-
-  res.status(201).json({
-    message: `Plan "${name}" added successfully!`,
-    plan: newPlan,
-  });
+  if (existingPlanIndex !== -1) {
+    userPlan.plans[existingPlanIndex] = newPlan;
+    await userPlan.save();
+    res.status(200).json({
+      message: `Plan "${name}" has been successfully overwritten!`,
+      plan: newPlan,
+    });
+  } else {
+    // Add new plan
+    userPlan.plans.push(newPlan);
+    await userPlan.save();
+    res.status(201).json({
+      message: `Plan "${name}" added successfully!`,
+      plan: newPlan,
+    });
+  }
 });
 
 exports.getAllPlansByUserHandler = catchAsync(async (req, res, next) => {

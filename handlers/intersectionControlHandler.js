@@ -47,9 +47,14 @@ exports.intersectionControlRequestHandler = catchAsync(
         console.error(`Unknown action: ${payload.action}`);
         return;
     }
+    console.log("Intersection Config", deviceState, {
+      DeviceID: payload.DeviceID,
+      [payload.action]: `${newActionValue}`,
+      ...additionalParams,
+    });
 
     clients.forEach((client) => {
-      // if (client.clientType !== payload.DeviceID) return;
+      if (client.clientType !== payload.DeviceID) return;
       client.send(
         JSON.stringify({
           Event: "ctrl",
