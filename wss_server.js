@@ -15,7 +15,14 @@ const { activityHandler } = require("./handlers/progHandler");
 const {
   intersectionControlRequestHandler,
 } = require("./handlers/intersectionControlHandler");
-const { uploadRequestHandler } = require("./handlers/uploadHandler");
+const {
+  uploadRequestHandler,
+  uploadHandler,
+} = require("./handlers/uploadHandler");
+const {
+  downloadHandler,
+  downloadRequestHandler,
+} = require("./handlers/downloadHandler");
 
 const PORT = 443;
 
@@ -62,6 +69,9 @@ function initWebSocketServer() {
           case "upload_request":
             uploadRequestHandler(ws, wss.clients, data?.payload);
             break;
+          case "download_request":
+            downloadRequestHandler(ws, wss.clients, data?.payload);
+            break;
 
           default:
             console.log("Unknown event from client:", data.event);
@@ -87,6 +97,12 @@ function initWebSocketServer() {
             break;
           case "prog":
             activityHandler(ws, wss.clients, data?.Param);
+            break;
+          case "upload":
+            uploadHandler(ws, wss.clients, data?.Param);
+            break;
+          case "download":
+            downloadHandler(ws, wss.clients, data?.Param);
             break;
 
           default:
