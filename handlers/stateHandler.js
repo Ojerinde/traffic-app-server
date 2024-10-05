@@ -20,8 +20,7 @@ exports.stateDataRequestHandler = catchAsync(async (ws, clients, payload) => {
 exports.deviceStateHandler = catchAsync(async (ws, clients, payload) => {
   console.log("Received State data from Hardware", payload);
 
-  const { DeviceID, Auto, Power, Manual, Next, Hold, Reset, Restart } =
-    payload || {};
+  const { DeviceID, Auto, Power, Next, Hold, Reset, Restart } = payload || {};
 
   if (!DeviceID) {
     return;
@@ -30,24 +29,22 @@ exports.deviceStateHandler = catchAsync(async (ws, clients, payload) => {
   let deviceState = await UserDeviceState.findOne({ DeviceID });
 
   if (deviceState) {
-    deviceState.Auto = Auto === "1" ? true : false;
-    deviceState.Power = Power === "1" ? true : false;
-    deviceState.Manual = Manual;
-    deviceState.Next = Next;
-    deviceState.Hold = Hold;
-    deviceState.Reset = Reset;
-    deviceState.Restart = Restart;
-    await deviceState.save();
+    (deviceState.Auto = Auto === "true" ? true : false),
+      (deviceState.Power = Power === "true" ? true : false),
+      (deviceState.Next = Next === "true" ? true : false),
+      (deviceState.Hold = Hold === "true" ? true : false),
+      (deviceState.Reset = Reset === "true" ? true : false),
+      (deviceState.Restart = Restart === "true" ? true : false),
+      await deviceState.save();
   } else {
     deviceState = await UserDeviceState.create({
       DeviceID,
       Auto: Auto === "1" ? true : false,
       Power: Power === "1" ? true : false,
-      Manual,
-      Next,
-      Hold,
-      Reset,
-      Restart,
+      Next: Next === "true" ? true : false,
+      Hold: Hold === "true" ? true : false,
+      Reset: Reset === "true" ? true : false,
+      Restart: Restart === "true" ? true : false,
     });
   }
   return clients.forEach((client) => {

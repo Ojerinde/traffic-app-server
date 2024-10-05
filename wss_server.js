@@ -123,7 +123,7 @@ function initWebSocketServer() {
       wss.clients.forEach((client) => {
         if (
           client.readyState === WebSocket.OPEN &&
-          client.clientType !== null
+          client.clientType !== idUtf8
         ) {
           client.send(message);
         }

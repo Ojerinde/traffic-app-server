@@ -97,10 +97,6 @@ const userDeviceStateSchema = new Schema({
     type: Boolean,
     required: true,
   },
-  Manual: {
-    type: Boolean,
-    required: true,
-  },
   Next: {
     type: Boolean,
     required: true,
