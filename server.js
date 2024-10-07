@@ -10,7 +10,6 @@ const {
   deviceStateHandler,
   stateDataRequestHandler,
 } = require("./handlers/stateHandler");
-const { activityHandler } = require("./handlers/progHandler");
 const {
   intersectionControlRequestHandler,
 } = require("./handlers/intersectionControlHandler");
@@ -62,7 +61,6 @@ function initWebSocketServer() {
           case "download_request":
             downloadRequestHandler(ws, wss.clients, data?.payload);
             break;
-
           default:
             console.log("Unknown event from client:", data.event);
         }
@@ -86,9 +84,7 @@ function initWebSocketServer() {
           case "state":
             deviceStateHandler(ws, wss.clients, data?.Param);
             break;
-          case "prog":
-            activityHandler(ws, wss.clients, data?.Param);
-            break;
+
           case "upload":
             uploadHandler(ws, wss.clients, data?.Param);
             break;

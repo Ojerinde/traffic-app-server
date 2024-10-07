@@ -115,22 +115,6 @@ const userDeviceStateSchema = new Schema({
   },
 });
 
-const userDeviceActivitySchema = new Schema({
-  DeviceID: { type: String, required: true },
-  Plan: {
-    type: String,
-    required: true,
-  },
-  Period: {
-    type: String,
-    required: true,
-  },
-  JunctionId: {
-    type: String,
-    required: true,
-  },
-});
-
 const userDeviceInfoSchema = new Schema({
   DeviceID: { type: String, required: true },
   Bat: {
@@ -145,6 +129,18 @@ const userDeviceInfoSchema = new Schema({
     type: String,
     required: true,
   },
+  Plan: {
+    type: String,
+    required: true,
+  },
+  Period: {
+    type: String,
+    required: true,
+  },
+  JunctionId: {
+    type: String,
+    required: true,
+  },
 });
 
 // Create models
@@ -156,10 +152,7 @@ const UserDeviceState = mongoose.model(
   "UserDeviceState",
   userDeviceStateSchema
 );
-const UserDeviceActivity = mongoose.model(
-  "UserDeviceActivity",
-  userDeviceActivitySchema
-);
+
 const UserDeviceInfo = mongoose.model("UserDeviceInfo", userDeviceInfoSchema);
 
 module.exports = {
@@ -168,6 +161,5 @@ module.exports = {
   UserPattern,
   UserPlan,
   UserDeviceState,
-  UserDeviceActivity,
   UserDeviceInfo,
 };
