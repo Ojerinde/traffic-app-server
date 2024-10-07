@@ -419,6 +419,7 @@ exports.confirmPasswordHandler = catchAsync(async (req, res) => {
 });
 
 exports.getDeviceActivityByDeviceIDHandler = catchAsync(async (req, res) => {
+  console.log("Getting device activity by device ID", req.params);
   const { deviceID } = req.params;
 
   const activity = await UserDeviceActivity.findOne({ DeviceID: deviceID });

@@ -101,7 +101,7 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
     client.send(
       JSON.stringify({
         Event: "ctrl",
-        Type: "program",
+        Type: "prog",
         Param: {
           DeviceID: payload.DeviceID,
           Plan: `/${payload.plan}s_new.txt`,
