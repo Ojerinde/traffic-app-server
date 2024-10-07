@@ -425,7 +425,7 @@ exports.getDeviceInfoByDeviceIDHandler = catchAsync(async (req, res) => {
 
   if (!info) {
     return res.status(404).json({
-      message: "Device info not found.",
+      message: "Device info doe not exist.",
     });
   }
 

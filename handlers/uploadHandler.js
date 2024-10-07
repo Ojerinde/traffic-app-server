@@ -88,14 +88,21 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
   //   Type: "program",
   //   Param: {
   //     DeviceID: payload.DeviceID,
-  //     Plan: `/${payload.plan}s_new.txt`,
+  //    Plan: dayToNum[payload.plan],
   //     Period: timeSegmentString,
-  //     JunctionId: payload.junctionId,
   //     Pattern: patternString.trim(),
   //   },
   // });
-
-  // Send the pattern strings to the clients
+  const dayToNum = {
+    SUNDAY: 0,
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
+  };
+  // Send the pattern strings to the hardware
   clients.forEach((client) => {
     if (client.clientType !== payload.DeviceID) return;
     client.send(
@@ -104,9 +111,8 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
         Type: "prog",
         Param: {
           DeviceID: payload.DeviceID,
-          Plan: `/${payload.plan}s_new.txt`,
+          Plan: dayToNum[payload.plan],
           Period: timeSegmentString,
-          JunctionId: payload.junctionId,
           Pattern: patternString.trim(),
         },
       })
