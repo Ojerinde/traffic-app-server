@@ -20,9 +20,10 @@ exports.downloadRequestHandler = catchAsync(async (ws, clients, payload) => {
   //     Plan: dayToNum[payload.plan],
   //   },
   // });
+
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
-    if (client.clientType !== payload.DeviceID) return;
+    // if (client.clientType !== payload.DeviceID) return;
     client.send(
       JSON.stringify({
         Event: "ctrl",
@@ -37,9 +38,8 @@ exports.downloadRequestHandler = catchAsync(async (ws, clients, payload) => {
 });
 
 exports.downloadHandler = catchAsync(async (ws, clients, payload) => {
-  console.log("Received download data feedback from Hardware", payload);
   return clients.forEach((client) => {
-    if (client.clientType === payload.DeviceID) return;
+    // if (client.clientType === payload.DeviceID) return;
     client.send(
       JSON.stringify({
         event: "download_feedback",

@@ -16,19 +16,22 @@ exports.intersectionControlRequestHandler = catchAsync(
 
     let newActionValue;
     let additionalParams = {};
-
+    let action = payload.action;
+    if (action === "Manual") {
+      action = "Auto";
+    }
     switch (payload.action) {
       case "Auto":
-        newActionValue = !deviceState.Auto;
         deviceState.Auto = true;
+        newActionValue = true;
         await deviceState.save();
         break;
       case "Manual":
-        newActionValue = !deviceState.Manual;
         if (payload.duration) additionalParams.duration = payload.duration;
         if (payload.signalString)
           additionalParams.signalString = payload.signalString;
         deviceState.Auto = false;
+        newActionValue = false;
         await deviceState.save();
         break;
       case "Hold":
@@ -52,11 +55,11 @@ exports.intersectionControlRequestHandler = catchAsync(
         console.error(`Unknown action: ${payload.action}`);
         return;
     }
-    console.log("Intersection Config", deviceState, {
-      DeviceID: payload.DeviceID,
-      [payload.action]: `${newActionValue}`,
-      ...additionalParams,
-    });
+    // console.log("Intersection Config", deviceState, {
+    //   DeviceID: payload.DeviceID,
+    //   [action]: `${newActionValue}`,
+    //   ...additionalParams,
+    // });
 
     clients.forEach((client) => {
       if (client.clientType !== payload.DeviceID) return;
@@ -66,7 +69,7 @@ exports.intersectionControlRequestHandler = catchAsync(
           Type: "state",
           Param: {
             DeviceID: payload.DeviceID,
-            [payload.action]: `${newActionValue}`,
+            [action]: `${newActionValue}`,
             ...additionalParams,
           },
         })

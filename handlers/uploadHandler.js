@@ -12,7 +12,7 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
   );
 
   // Format the pattern phases
-  const patternPhases = pattern.configuredPhases.map((phase) => ({
+  const patternPhases = pattern?.configuredPhases.map((phase) => ({
     PhaseName: phase.name,
     PhaseId: phase.phaseId,
     SignalString: phase.signalString,
@@ -57,16 +57,19 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
 
   // Extract hours and minutes from timeSegment
   const [hours, minutes] = payload.timeSegment.split(":").map(Number);
-  let startMinutes = minutes + 1;
+  let startMinutes = minutes;
   let startHours = hours;
   if (startMinutes >= 60) {
     startMinutes -= 60;
     startHours += 1;
   }
+
   if (startHours >= 24) {
     startHours = 0;
   }
-  let endMinutes = startMinutes + 29;
+
+  let endMinutes =
+    payload.timeSegment === "00:00" ? startMinutes + 30 : startMinutes + 29;
   let endHours = startHours;
   if (endMinutes >= 60) {
     endMinutes -= 60;
@@ -83,16 +86,6 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
   ).padStart(2, "0")}`;
   const timeSegmentString = `@${startTime}-${endTime}`;
 
-  // console.log("Generated Data:\n", patternString.trim(), {
-  //   Event: "ctrl",
-  //   Type: "program",
-  //   Param: {
-  //     DeviceID: payload.DeviceID,
-  //    Plan: dayToNum[payload.plan],
-  //     Period: timeSegmentString,
-  //     Pattern: patternString.trim(),
-  //   },
-  // });
   const dayToNum = {
     SUNDAY: 0,
     MONDAY: 1,
@@ -102,9 +95,21 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
     FRIDAY: 5,
     SATURDAY: 6,
   };
+
+  console.log("Generated Data:\n", patternString.trim(), {
+    Event: "ctrl",
+    Type: "program",
+    Param: {
+      DeviceID: payload.DeviceID,
+      Plan: dayToNum[payload.plan],
+      Period: timeSegmentString,
+      Pattern: patternString.trim(),
+    },
+  });
+
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
-    if (client.clientType !== payload.DeviceID) return;
+    // if (client.clientType !== payload.DeviceID) return;
     client.send(
       JSON.stringify({
         Event: "ctrl",
@@ -121,13 +126,28 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
 });
 
 exports.uploadHandler = catchAsync(async (ws, clients, payload) => {
-  console.log("Received upload data feedback from Hardware", payload);
+  const { DeviceID, Plan, Period } = payload || {};
+
+  const modifiedPeriod = Period?.slice(1, 6);
+  const numToDay = {
+    0: "SUNDAY",
+    1: "MONDAY",
+    2: "TUESDAY",
+    3: "WEDNESDAY",
+    4: "THURSDAY",
+    5: "FRIDAY",
+    6: "SATURDAY",
+  };
   return clients.forEach((client) => {
     if (client.clientType === payload.DeviceID) return;
     client.send(
       JSON.stringify({
         event: "upload_feedback",
-        payload,
+        payload: {
+          DeviceID,
+          Plan: numToDay[Plan],
+          Period: modifiedPeriod,
+        },
       })
     );
   });

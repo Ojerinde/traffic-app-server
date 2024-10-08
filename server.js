@@ -13,14 +13,11 @@ const {
 const {
   intersectionControlRequestHandler,
 } = require("./handlers/intersectionControlHandler");
+const { uploadRequestHandler } = require("./handlers/uploadHandler");
+const { downloadRequestHandler } = require("./handlers/downloadHandler");
 const {
-  uploadRequestHandler,
-  uploadHandler,
-} = require("./handlers/uploadHandler");
-const {
-  downloadHandler,
-  downloadRequestHandler,
-} = require("./handlers/downloadHandler");
+  uploadAndDownloadHandler,
+} = require("./handlers/uploadAndDownloadHandler");
 
 const PORT = process.env.PORT || 5000;
 
@@ -84,12 +81,8 @@ function initWebSocketServer() {
           case "state":
             deviceStateHandler(ws, wss.clients, data?.Param);
             break;
-
-          case "upload":
-            uploadHandler(ws, wss.clients, data?.Param);
-            break;
-          case "download":
-            downloadHandler(ws, wss.clients, data?.Param);
+          case "prog":
+            uploadAndDownloadHandler(ws, wss.clients, data?.Param);
             break;
           default:
             console.log("Unknown event from hardware:", data?.Event);
