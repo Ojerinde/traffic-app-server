@@ -81,9 +81,10 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
   const startTime = `${String(startHours).padStart(2, "0")}:${String(
     startMinutes
   ).padStart(2, "0")}`;
-  const endTime = `${String(endHours).padStart(2, "0")}:${String(
+  let endTime = `${String(endHours).padStart(2, "0")}:${String(
     endMinutes
   ).padStart(2, "0")}`;
+  endTime = endTime === "00:00" ? "23:59" : endTime;
   const timeSegmentString = `@${startTime}-${endTime}`;
 
   const dayToNum = {
