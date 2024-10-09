@@ -55,38 +55,6 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
     }
   });
 
-  // Extract hours and minutes from timeSegment
-  const [hours, minutes] = payload.timeSegment.split(":").map(Number);
-  let startMinutes = minutes;
-  let startHours = hours;
-  if (startMinutes >= 60) {
-    startMinutes -= 60;
-    startHours += 1;
-  }
-
-  if (startHours >= 24) {
-    startHours = 0;
-  }
-
-  let endMinutes =
-    payload.timeSegment === "00:00" ? startMinutes + 30 : startMinutes + 29;
-  let endHours = startHours;
-  if (endMinutes >= 60) {
-    endMinutes -= 60;
-    endHours += 1;
-  }
-  if (endHours >= 24) {
-    endHours = 0;
-  }
-  const startTime = `${String(startHours).padStart(2, "0")}:${String(
-    startMinutes
-  ).padStart(2, "0")}`;
-  let endTime = `${String(endHours).padStart(2, "0")}:${String(
-    endMinutes
-  ).padStart(2, "0")}`;
-  endTime = endTime === "00:00" ? "23:59" : endTime;
-  const timeSegmentString = `@${startTime}-${endTime}`;
-
   const dayToNum = {
     MONDAY: "1",
     TUESDAY: "2",
@@ -103,7 +71,7 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
     Param: {
       DeviceID: payload.DeviceID,
       Plan: dayToNum[payload.plan],
-      Period: timeSegmentString,
+      Period: payload.timeSegmentString,
       Pattern: patternString.trim(),
     },
   });
