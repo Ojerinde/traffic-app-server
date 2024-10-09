@@ -87,13 +87,13 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
   const timeSegmentString = `@${startTime}-${endTime}`;
 
   const dayToNum = {
-    SUNDAY: 0,
-    MONDAY: 1,
-    TUESDAY: 2,
-    WEDNESDAY: 3,
-    THURSDAY: 4,
-    FRIDAY: 5,
-    SATURDAY: 6,
+    SUNDAY: "0",
+    MONDAY: "1",
+    TUESDAY: "2",
+    WEDNESDAY: "3",
+    THURSDAY: "4",
+    FRIDAY: "5",
+    SATURDAY: "6",
   };
 
   console.log("Generated Data:\n", patternString.trim(), {
@@ -109,7 +109,7 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
 
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
-    // if (client.clientType !== payload.DeviceID) return;
+    if (client.clientType !== payload.DeviceID) return;
     client.send(
       JSON.stringify({
         Event: "ctrl",

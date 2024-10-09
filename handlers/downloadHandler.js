@@ -23,7 +23,7 @@ exports.downloadRequestHandler = catchAsync(async (ws, clients, payload) => {
 
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
-    // if (client.clientType !== payload.DeviceID) return;
+    if (client.clientType !== payload.DeviceID) return;
     client.send(
       JSON.stringify({
         Event: "ctrl",
@@ -39,7 +39,7 @@ exports.downloadRequestHandler = catchAsync(async (ws, clients, payload) => {
 
 exports.downloadHandler = catchAsync(async (ws, clients, payload) => {
   return clients.forEach((client) => {
-    // if (client.clientType === payload.DeviceID) return;
+    if (client.clientType === payload.DeviceID) return;
     client.send(
       JSON.stringify({
         event: "download_feedback",
