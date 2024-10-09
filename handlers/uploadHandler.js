@@ -88,13 +88,13 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
   const timeSegmentString = `@${startTime}-${endTime}`;
 
   const dayToNum = {
-    SUNDAY: "0",
     MONDAY: "1",
     TUESDAY: "2",
     WEDNESDAY: "3",
     THURSDAY: "4",
     FRIDAY: "5",
     SATURDAY: "6",
+    SUNDAY: "7",
   };
 
   console.log("Generated Data:\n", patternString.trim(), {
@@ -131,13 +131,13 @@ exports.uploadHandler = catchAsync(async (ws, clients, payload) => {
 
   const modifiedPeriod = Period?.slice(1, 6);
   const numToDay = {
-    0: "SUNDAY",
     1: "MONDAY",
     2: "TUESDAY",
     3: "WEDNESDAY",
     4: "THURSDAY",
     5: "FRIDAY",
     6: "SATURDAY",
+    7: "SUNDAY",
   };
   return clients.forEach((client) => {
     if (client.clientType === payload.DeviceID) return;
