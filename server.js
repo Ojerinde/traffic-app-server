@@ -18,6 +18,7 @@ const { downloadRequestHandler } = require("./handlers/downloadHandler");
 const {
   uploadAndDownloadHandler,
 } = require("./handlers/uploadAndDownloadHandler");
+const { manualControlHandler } = require("./handlers/manualHandler");
 
 const PORT = process.env.PORT || 5000;
 
@@ -57,6 +58,9 @@ function initWebSocketServer() {
             break;
           case "download_request":
             downloadRequestHandler(ws, wss.clients, data?.payload);
+            break;
+          case "signal_request":
+            manualControlHandler(ws, wss.clients, data?.payload);
             break;
           default:
             console.log("Unknown event from client:", data.event);

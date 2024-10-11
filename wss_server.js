@@ -19,6 +19,7 @@ const { downloadRequestHandler } = require("./handlers/downloadHandler");
 const {
   uploadAndDownloadHandler,
 } = require("./handlers/uploadAndDownloadHandler");
+const { manualControlHandler } = require("./handlers/manualHandler");
 
 const PORT = 443;
 
@@ -67,6 +68,9 @@ function initWebSocketServer() {
             break;
           case "download_request":
             downloadRequestHandler(ws, wss.clients, data?.payload);
+            break;
+          case "signal_request":
+            manualControlHandler(ws, wss.clients, data?.payload);
             break;
 
           default:
