@@ -9,13 +9,13 @@ exports.intersectionControlRequestHandler = catchAsync(
     const deviceState = await UserDeviceState.findOne({
       DeviceID: payload.DeviceID,
     });
+
     if (!deviceState) {
       console.error(`Device with ID ${payload.DeviceID} not found.`);
       return;
     }
 
     let newActionValue;
-    let additionalParams = {};
     let action = payload.action;
     if (action === "Manual") {
       action = "Auto";
@@ -28,13 +28,9 @@ exports.intersectionControlRequestHandler = catchAsync(
         await deviceState.save();
         break;
       case "Manual":
-        if (payload.duration) additionalParams.duration = payload.duration;
-        if (payload.signalString)
-          additionalParams.signalString = payload.signalString;
         deviceState.Auto = false;
         newActionValue = false;
         await deviceState.save();
-
       case "Hold":
         newActionValue = !deviceState.Hold;
         break;
@@ -66,7 +62,6 @@ exports.intersectionControlRequestHandler = catchAsync(
           Param: {
             DeviceID: payload.DeviceID,
             [action]: `${newActionValue}`,
-            ...additionalParams,
           },
         })
       );
