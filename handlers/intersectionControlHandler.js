@@ -21,16 +21,12 @@ exports.intersectionControlRequestHandler = catchAsync(
       action = "Auto";
     }
 
-    switch (payload.action) {
+    switch (action) {
       case "Auto":
-        deviceState.Auto = true;
-        newActionValue = true;
+        newActionValue = !deviceState.Auto;
+        deviceState.Auto = !deviceState.Auto;
         await deviceState.save();
         break;
-      case "Manual":
-        deviceState.Auto = false;
-        newActionValue = false;
-        await deviceState.save();
       case "Hold":
         newActionValue = !deviceState.Hold;
         break;
