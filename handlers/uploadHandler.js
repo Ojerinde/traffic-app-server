@@ -65,20 +65,20 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
     SUNDAY: "6",
   };
 
-  console.log("Generated Data:\n", patternString.trim(), {
-    Event: "ctrl",
-    Type: "program",
-    Param: {
-      DeviceID: payload.DeviceID,
-      Plan: dayToNum[payload.plan],
-      Period: payload.timeSegmentString,
-      Pattern: patternString.trim(),
-    },
-  });
+  // console.log("Generated Data:\n", patternString.trim(), {
+  //   Event: "ctrl",
+  //   Type: "program",
+  //   Param: {
+  //     DeviceID: payload.DeviceID,
+  //     Plan: dayToNum[payload.plan],
+  //     Period: payload.timeSegmentString,
+  //     Pattern: patternString.trim(),
+  //   },
+  // });
 
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
-    // if (client.clientType !== payload.DeviceID) return;
+    if (client.clientType !== payload.DeviceID) return;
     client.send(
       JSON.stringify({
         Event: "ctrl",
@@ -86,7 +86,7 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
         Param: {
           DeviceID: payload.DeviceID,
           Plan: dayToNum[payload.plan],
-          Period: timeSegmentString,
+          Period: payload.timeSegmentString,
           Pattern: patternString.trim(),
         },
       })
