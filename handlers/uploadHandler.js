@@ -34,7 +34,11 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
 
   patternPhases.forEach((phase) => {
     // Base signal string with phase duration
-    patternString += `*${phase.Duration}${phase.SignalString}\n`;
+    patternString += `*${phase.Duration == 0 ? "X" : phase.Duration}${
+      phase.SignalString
+    }\n`;
+
+    // If prev signal is not the same with current signal, send blink
 
     // If BlinkEnabled, toggle between original and modified signal strings
     if (patternSettings.BlinkEnabled) {
@@ -65,20 +69,20 @@ exports.uploadRequestHandler = catchAsync(async (ws, clients, payload) => {
     SUNDAY: "6",
   };
 
-  // console.log("Generated Data:\n", patternString.trim(), {
-  //   Event: "ctrl",
-  //   Type: "program",
-  //   Param: {
-  //     DeviceID: payload.DeviceID,
-  //     Plan: dayToNum[payload.plan],
-  //     Period: payload.timeSegmentString,
-  //     Pattern: patternString.trim(),
-  //   },
-  // });
+  console.log("Generated Data:\n", patternString.trim(), {
+    Event: "ctrl",
+    Type: "program",
+    Param: {
+      DeviceID: payload.DeviceID,
+      Plan: dayToNum[payload.plan],
+      Period: payload.timeSegmentString,
+      Pattern: patternString.trim(),
+    },
+  });
 
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
-    if (client.clientType !== payload.DeviceID) return;
+    // if (client.clientType !== payload.DeviceID) return;
     client.send(
       JSON.stringify({
         Event: "ctrl",
