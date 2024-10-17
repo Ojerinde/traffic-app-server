@@ -11,7 +11,7 @@ exports.infoDataRequestHandler = catchAsync(async (ws, clients, payload) => {
         Type: "info",
         Param: {
           DeviceID: payload.DeviceID,
-          Rtc: Math.floor((Date.now() + 1 * 60 * 60 * 1000) / 1000),
+          Rtc: Math.floor(Date.now() / 1000),
         },
       })
     );
@@ -26,7 +26,7 @@ exports.infoDataHandler = catchAsync(async (ws, clients, payload) => {
     return;
   }
 
-  const currentTime = Math.floor((Date.now() + 1 * 60 * 60 * 1000) / 1000);
+  const currentTime = Math.floor(Date.now() / 1000);
   const timeDifference = currentTime - Rtc;
   console.log("Test", currentTime, timeDifference, Rtc);
   if (timeDifference > 60 || timeDifference < -60) {

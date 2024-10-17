@@ -89,7 +89,7 @@ function initWebSocketServer() {
                   Type: "info",
                   Param: {
                     DeviceID: data.Param.DeviceID,
-                    Rtc: Math.floor((Date.now() + 1 * 60 * 60 * 1000) / 1000),
+                    Rtc: Math.floor(Date.now() / 1000),
                   },
                 })
               );
