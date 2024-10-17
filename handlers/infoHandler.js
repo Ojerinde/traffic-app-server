@@ -11,7 +11,7 @@ exports.infoDataRequestHandler = catchAsync(async (ws, clients, payload) => {
         Type: "info",
         Param: {
           DeviceID: payload.DeviceID,
-          Rtc: Date.now(),
+          Rtc: Math.floor(Date.now() / 1000),
         },
       })
     );
