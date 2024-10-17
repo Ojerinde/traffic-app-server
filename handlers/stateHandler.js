@@ -11,7 +11,6 @@ exports.stateDataRequestHandler = catchAsync(async (ws, clients, payload) => {
         Type: "state",
         Param: {
           DeviceID: payload.DeviceID,
-          Rtc: Math.floor(Date.now() / 1000),
         },
       })
     );
