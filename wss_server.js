@@ -101,7 +101,7 @@ function initWebSocketServer() {
                   Type: "info",
                   Param: {
                     DeviceID: data.Param.DeviceID,
-                    Rtc: Date.now(),
+                    Rtc: Math.floor(Date.now() / 1000),
                   },
                 })
               );
