@@ -28,23 +28,24 @@ exports.infoDataHandler = catchAsync(async (ws, clients, payload) => {
 
   const currentTime = Math.floor(Date.now() / 1000);
   const timeDifference = currentTime - Rtc;
-  if (timeDifference > 60 || timeDifference < -60) {
-    clients.forEach((client) => {
-      if (client.clientType === DeviceID) {
-        client.send(
-          JSON.stringify({
-            Event: "ctrl",
-            Type: "info",
-            Param: {
-              DeviceID: payload.DeviceID,
-              Rtc: currentTime,
-            },
-          })
-        );
-      }
-    });
-    return;
-  }
+  console.log("Test", currentTime, timeDifference);
+  // if (timeDifference > 60 || timeDifference < -60) {
+  //   clients.forEach((client) => {
+  //     if (client.clientType === DeviceID) {
+  //       client.send(
+  //         JSON.stringify({
+  //           Event: "ctrl",
+  //           Type: "info",
+  //           Param: {
+  //             DeviceID: payload.DeviceID,
+  //             Rtc: currentTime,
+  //           },
+  //         })
+  //       );
+  //     }
+  //   });
+  //   return;
+  // }
 
   let deviceInfo = await UserDeviceInfo.findOne({ DeviceID });
 
