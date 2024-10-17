@@ -94,13 +94,13 @@ function initWebSocketServer() {
             ws.clientType = data.Param.DeviceID;
             console.log(ws.clientType);
             return wss.clients.forEach((client) => {
-              if (client.clientType !== payload.DeviceID) return;
+              if (client.clientType !== data.Param.DeviceID) return;
               client.send(
                 JSON.stringify({
                   Event: "ctrl",
                   Type: "info",
                   Param: {
-                    DeviceID: payload.DeviceID,
+                    DeviceID: data.Param.DeviceID,
                     Rtc: Date.now(),
                   },
                 })
