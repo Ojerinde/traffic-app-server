@@ -28,7 +28,7 @@ exports.infoDataHandler = catchAsync(async (ws, clients, payload) => {
 
   const currentTime = Math.floor(Date.now() / 1000);
   const timeDifference = currentTime - Rtc;
-  console.log("Test", currentTime, timeDifference);
+  console.log("Test", currentTime, timeDifference, Rtc);
   // if (timeDifference > 60 || timeDifference < -60) {
   //   clients.forEach((client) => {
   //     if (client.clientType === DeviceID) {
