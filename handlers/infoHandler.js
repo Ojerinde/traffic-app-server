@@ -1,6 +1,23 @@
 const { UserDeviceInfo } = require("../models/appModel");
 const catchAsync = require("../utils/catchAsync");
 
+exports.infoDataRequestHandler = catchAsync(async (ws, clients, payload) => {
+  console.log("Received info request data from Client", payload);
+  return clients.forEach((client) => {
+    if (client.clientType !== payload.DeviceID) return;
+    client.send(
+      JSON.stringify({
+        Event: "ctrl",
+        Type: "info",
+        Param: {
+          DeviceID: payload.DeviceID,
+          Rtc: Date.now(),
+        },
+      })
+    );
+  });
+});
+
 exports.infoDataHandler = catchAsync(async (ws, clients, payload) => {
   console.log("Received info data from Hardware", payload);
   const { DeviceID, Bat, Temp, Rtc, Plan, Period, JunctionId } = payload || {};
