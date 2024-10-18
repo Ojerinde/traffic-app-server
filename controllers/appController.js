@@ -308,7 +308,7 @@ exports.editPatternByUserHandler = catchAsync(async (req, res) => {
 });
 
 exports.addPlanByUserHandler = catchAsync(async (req, res) => {
-  console.log("Adding or updating plan by user", req.body);
+  // console.log("Adding or updating plan by user", req.body.schedule);
   const { id, name, email, schedule, dayType, customDate } = req.body;
 
   let userPlan = await UserPlan.findOne({ email });
@@ -319,6 +319,100 @@ exports.addPlanByUserHandler = catchAsync(async (req, res) => {
   const existingPlanIndex = userPlan.plans.findIndex(
     (plan) => plan.name === name
   );
+
+  const newPlan = {
+    id,
+    name,
+    dayType,
+    schedule,
+    customDate,
+  };
+
+  if (existingPlanIndex !== -1) {
+    userPlan.plans[existingPlanIndex] = newPlan;
+    await userPlan.save();
+    res.status(200).json({
+      message: `Plan "${name}" has been successfully overwritten!`,
+      plan: newPlan,
+    });
+  } else {
+    // Add new plan
+    userPlan.plans.push(newPlan);
+    await userPlan.save();
+    res.status(201).json({
+      message: `Plan "${name}" added successfully!`,
+      plan: newPlan,
+    });
+  }
+});
+
+exports.updatePlanByUserHandler = catchAsync(async (req, res) => {
+  console.log("Newly updating plan by user", req.body.data);
+
+  const { id, name, email, data, dayType, customDate } = req.body;
+
+  function generateTimeSegments() {
+    const segments = [];
+
+    segments.push("00:00");
+
+    let hour = 0;
+    let minute = 31;
+
+    while (hour < 24) {
+      const time = `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
+      segments.push(time);
+
+      minute += 30;
+
+      if (minute >= 60) {
+        minute -= 60;
+        hour += 1;
+      }
+
+      if (hour >= 24) break;
+    }
+
+    return segments;
+  }
+  const timeSegments = generateTimeSegments();
+
+  const generateSchedule = (plan) => {
+    console.log("Plan:", plan);
+
+    const schedule = {};
+
+    timeSegments.forEach((segment) => {
+      const matchingEntry = plan.find((entry) => entry.period === segment);
+
+      schedule[segment] = matchingEntry
+        ? {
+            value: matchingEntry.name.toLowerCase(),
+            label: matchingEntry.name,
+          }
+        : null;
+    });
+
+    return schedule;
+  };
+
+  // Create the new schedule
+  const newSchedule = generateSchedule(data);
+  console.log("Newly Generated Schedule:", data, newSchedule);
+
+  let userPlan = await UserPlan.findOne({ email });
+
+  if (!userPlan) {
+    userPlan = new UserPlan({ email, plans: [] });
+  }
+
+  const existingPlanIndex = userPlan.plans.findIndex(
+    (plan) => plan.name === name
+  );
+  return;
+
   const newPlan = {
     id,
     name,

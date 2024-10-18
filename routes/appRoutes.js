@@ -25,6 +25,7 @@ router.put(
 );
 
 router.post("/plans", appController.addPlanByUserHandler);
+router.put("/plans", appController.updatePlanByUserHandler);
 router.get("/plans/:email", appController.getAllPlansByUserHandler);
 router.delete("/plans/:planId/:email", appController.deletePlanByUserHandler);
 
