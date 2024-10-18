@@ -1,3 +1,4 @@
+const { config } = require("dotenv");
 const { AdminDevice } = require("../models/adminAppModel");
 const {
   UserDevice,
@@ -351,6 +352,52 @@ exports.updatePlanByUserHandler = catchAsync(async (req, res) => {
 
   const { id, name, email, data, dayType, customDate } = req.body;
 
+  // Create all the pattern
+  const user = await UserPhase.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found!" });
+  }
+
+  for (const pattern of data) {
+    const {
+      name: patternName,
+      config: {
+        configuredPhases,
+        blinkEnabled,
+        blinkTimeRedToGreen,
+        blinkTimeGreenToRed,
+        amberEnabled,
+        amberDurationRedToGreen,
+        amberDurationGreenToRed,
+      },
+    } = pattern;
+
+    const newPattern = {
+      name: patternName,
+      blinkEnabled,
+      blinkTimeRedToGreen,
+      blinkTimeGreenToRed,
+      amberEnabled,
+      amberDurationRedToGreen,
+      amberDurationGreenToRed,
+      configuredPhases: configuredPhases.map((phase, index) => ({
+        name: phase.name,
+        phaseId: phase.id,
+        signalString: phase.signalString,
+        duration: phase.duration,
+        id: index,
+      })),
+    };
+
+    // Add the pattern to the database
+    await UserPattern.findOneAndUpdate(
+      { email },
+      { $push: { patterns: newPattern } },
+      { upsert: true }
+    );
+  }
+
+  // Create th Plan
   function generateTimeSegments() {
     const segments = [];
 
@@ -380,8 +427,6 @@ exports.updatePlanByUserHandler = catchAsync(async (req, res) => {
   const timeSegments = generateTimeSegments();
 
   const generateSchedule = (plan) => {
-    console.log("Plan:", plan);
-
     const schedule = {};
 
     timeSegments.forEach((segment) => {
@@ -400,7 +445,6 @@ exports.updatePlanByUserHandler = catchAsync(async (req, res) => {
 
   // Create the new schedule
   const newSchedule = generateSchedule(data);
-  console.log("Newly Generated Schedule:", data, newSchedule);
 
   let userPlan = await UserPlan.findOne({ email });
 
@@ -409,15 +453,14 @@ exports.updatePlanByUserHandler = catchAsync(async (req, res) => {
   }
 
   const existingPlanIndex = userPlan.plans.findIndex(
-    (plan) => plan.name === name
+    (plan) => plan.name.toLowerCase() === name.toLowerCase()
   );
-  return;
 
   const newPlan = {
     id,
     name,
     dayType,
-    schedule,
+    schedule: newSchedule,
     customDate,
   };
 
