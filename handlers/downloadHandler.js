@@ -13,14 +13,14 @@ exports.downloadRequestHandler = catchAsync(async (ws, clients, payload) => {
     SUNDAY: "6",
   };
 
-  // console.log("Download",{
-  //   Event: "ctrl",
-  //   Type: "prog",
-  //   Param: {
-  //     DeviceID: payload.DeviceID,
-  //     Plan: dayToNum[payload.plan],
-  //   },
-  // });
+  console.log("Download", {
+    Event: "ctrl",
+    Type: "prog",
+    Param: {
+      DeviceID: payload.DeviceID,
+      Plan: dayToNum[payload.plan],
+    },
+  });
 
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
