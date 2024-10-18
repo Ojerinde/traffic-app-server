@@ -3,24 +3,13 @@ const catchAsync = require("../utils/catchAsync");
 exports.downloadRequestHandler = catchAsync(async (ws, clients, payload) => {
   console.log("Received download request data from Client", payload);
 
-  const dayToNum = {
-    MONDAY: "0",
-    TUESDAY: "1",
-    WEDNESDAY: "2",
-    THURSDAY: "3",
-    FRIDAY: "4",
-    SATURDAY: "5",
-    SUNDAY: "6",
-  };
-
-  console.log("Download", {
-    Event: "ctrl",
-    Type: "prog",
-    Param: {
-      DeviceID: payload.DeviceID,
-      Plan: dayToNum[payload.plan],
-    },
-  });
+  // console.log("Download", {
+  //   Event: "ctrl",
+  //   Type: "prog",
+  //   Param: {
+  //     DeviceID: payload.DeviceID,
+  //   },
+  // });
 
   // Send the pattern strings to the hardware
   clients.forEach((client) => {
@@ -31,7 +20,6 @@ exports.downloadRequestHandler = catchAsync(async (ws, clients, payload) => {
         Type: "prog",
         Param: {
           DeviceID: payload.DeviceID,
-          Plan: dayToNum[payload.plan],
         },
       })
     );
