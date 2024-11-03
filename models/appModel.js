@@ -117,30 +117,26 @@ const userDeviceStateSchema = new Schema({
 
 const userDeviceInfoSchema = new Schema({
   DeviceID: { type: String, required: true },
-  Bat: {
-    type: String,
-    required: true,
+  North: {
+    Bat: { type: String },
+    Temp: { type: String },
   },
-  Temp: {
-    type: String,
-    required: true,
+  East: {
+    Bat: { type: String },
+    Temp: { type: String },
   },
-  Rtc: {
-    type: String,
-    required: true,
+  West: {
+    Bat: { type: String },
+    Temp: { type: String },
   },
-  Plan: {
-    type: String,
-    required: true,
+  South: {
+    Bat: { type: String },
+    Temp: { type: String },
   },
-  Period: {
-    type: String,
-    required: true,
-  },
-  JunctionId: {
-    type: String,
-    required: true,
-  },
+  Rtc: { type: String, required: true },
+  Plan: { type: String, required: true },
+  Period: { type: String, required: true },
+  JunctionId: { type: String, required: true },
 });
 
 // Create models

@@ -1,4 +1,3 @@
-const { config } = require("dotenv");
 const { AdminDevice } = require("../models/adminAppModel");
 const {
   UserDevice,
