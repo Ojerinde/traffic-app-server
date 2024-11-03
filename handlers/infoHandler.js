@@ -17,18 +17,33 @@ exports.infoDataRequestHandler = catchAsync(async (ws, clients, payload) => {
     );
   });
 });
-
 exports.infoDataHandler = catchAsync(async (ws, clients, payload) => {
   console.log("Received info data from Hardware", payload);
-  const { DeviceID, North, East, West, South, Rtc, Plan, Period, JunctionId } =
-    payload || {};
+  const { DeviceID, Rtc, Plan, Period, JunctionId } = payload || {};
+
+  // Set default values for nested properties in each direction
+  const North = {
+    Bat: payload?.North?.Bat ?? null,
+    Temp: payload?.North?.Temp ?? null,
+  };
+  const East = {
+    Bat: payload?.East?.Bat ?? null,
+    Temp: payload?.East?.Temp ?? null,
+  };
+  const West = {
+    Bat: payload?.West?.Bat ?? null,
+    Temp: payload?.West?.Temp ?? null,
+  };
+  const South = {
+    Bat: payload?.South?.Bat ?? null,
+    Temp: payload?.South?.Temp ?? null,
+  };
 
   if (!DeviceID) {
     return;
   }
 
   const currentTime = Math.floor(Date.now() / 1000 + 3600);
-  // const readableTime = new Date(currentTime * 1000).toLocaleTimeString();
   const timeDifference = currentTime - Rtc;
 
   if (timeDifference > 60 || timeDifference < -60) {
@@ -74,6 +89,7 @@ exports.infoDataHandler = catchAsync(async (ws, clients, payload) => {
       JunctionId,
     });
   }
+
   return clients.forEach((client) => {
     if (client.clientType === payload.DeviceID) return;
     client.send(
